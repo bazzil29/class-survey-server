@@ -8,6 +8,6 @@ const surveySchema = mongoose.Schema({
     survey_template: String
 })
 
-const ClassSurvey = mongoose.model("ClassSurvey", surveySchema, surveys);
+const ClassSurvey = mongoose.model("ClassSurvey", surveySchema, 'surveys');
 
 module.exports = ClassSurvey;

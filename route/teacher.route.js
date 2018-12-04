@@ -8,6 +8,6 @@ const teacher = require('../controller/teacher.controller');
 
 
 router.get('/:teacherId/classes', tokenChecker.verify, teacher.getClasses);
-router.get('/:teacherId/classes/:classId/surver', tokenChecker.verify, teacher.getSurvey)
+router.get('/:teacherId/classes/:classId/survey', tokenChecker.verify, teacher.getSurvey)
 
 module.exports = router;

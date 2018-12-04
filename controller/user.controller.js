@@ -11,7 +11,6 @@ module.exports = {
             .then(res => {
                 console.log(res);
             })
-        console.log(tmp);
         res.end(JSON.stringify(response));
     },
 

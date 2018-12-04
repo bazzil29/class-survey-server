@@ -4,7 +4,6 @@ const User = require('../models/users.models');
 module.exports = {
     verify: async (req, res, next) => {
         const { access_token } = req.headers;
-
         if (access_token) {
             try {
                 const value = jwt.verify(access_token).body.value;

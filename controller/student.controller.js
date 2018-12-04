@@ -28,30 +28,38 @@ module.exports = {
         const { studentId, classId } = req.params;
         const { _id, role_id } = req.body;
         const student = await User.findById(studentId);
-        if (student && student.role_id === role_id && role_id === 3 && _id === studentId) {
-            const classTmp = student.class.find(e => {
-                return e.id === classId;
-            });
-            const survey = await StudentSurvey.findById(classTmp.survey_student);
-            if (survey) {
-                res.send({
-                    success: true,
-                    data: {
-                        survey: survey
-                    }
-                })
+        try {
+            if (student && student.role_id === role_id && role_id === 3 && _id === studentId) {
+                const classTmp = student.class.find(e => {
+                    return e.id === classId;
+                });
+                const survey = await StudentSurvey.findById(classTmp.survey_student);
+                if (survey) {
+                    res.send({
+                        success: true,
+                        data: {
+                            survey: survey
+                        }
+                    })
+                }
+                else {
+                    res.send({
+                        success: false,
+                        message: "survey is not exist!"
+                    })
+                }
             }
             else {
                 res.send({
                     success: false,
-                    message: "survey is not exist!"
+                    message: "User not found or role id not correct! "
                 })
             }
         }
-        else {
+        catch (err) {
             res.send({
                 success: false,
-                message: "User not found or role id not correct! "
+                message: "User can't access this!"
             })
         }
     },
@@ -60,45 +68,54 @@ module.exports = {
         const { studentId, classId } = req.params;
         const { _id, role_id, survey: surveyReq } = req.body;
         const student = await User.findById(studentId);
-        if (student && student.role_id === role_id && role_id === 3 && _id === studentId) {
-            const classTmp = student.class.find(e => {
-                return e.id === classId;
-            });
-            const survey = await StudentSurvey.findById(classTmp.survey_student);
-            if (survey) {
-                if (surveyChecker.verify(surveyReq)) {
-                    try {
-                        survey.set({ ...surveyReq });
-                        survey.save();
+        try {
+            if (student && student.role_id === role_id && role_id === 3 && _id === studentId) {
+                const classTmp = student.class.find(e => {
+                    return e.id === classId;
+                });
+                const survey = await StudentSurvey.findById(classTmp.survey_student);
+                if (survey) {
+                    if (surveyChecker.verify(surveyReq)) {
+                        try {
+                            survey.set({ ...surveyReq });
+                            survey.save();
+                            res.send({
+                                sucess: true
+                            })
+                        }
+                        catch (err) {
+                            console.log(err);
+                        }
+
+                    }
+                    else {
                         res.send({
-                            sucess: true
+                            success: false,
+                            message: "Not suport this form of survey!"
                         })
                     }
-                    catch (err) {
-                        console.log(err);
-                    }
-
                 }
                 else {
                     res.send({
                         success: false,
-                        message: "Not suport this form of survey!"
+                        message: "survey is not exist!"
                     })
                 }
-            }
-            else {
+
+            } else {
                 res.send({
                     success: false,
-                    message: "survey is not exist!"
+                    message: "User not found or role id not correct! "
                 })
             }
-
-        } else {
+        } catch (err) {
+            console.log(err);
             res.send({
                 success: false,
-                message: "User not found or role id not correct! "
+                message: "User can't access this!"
             })
         }
+
     }
 
 }
