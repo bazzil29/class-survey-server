@@ -3,37 +3,36 @@ const JWT = require("./jwt");
 const bcrypt = require('../services/bcrypt');
 
 module.exports = {
-    create: async (data, role_id) => {
-        const users = await User.find();
-        if (users !== null) {
-            console.log(users);
-            const testUsers = users.filter(element => {
-                return element._id === data._id;
-            });
-            const hashPassword = bcrypt.create(data.password);
-            if (testUsers.length === 0) {
+    create: async (data, role_id, _classes = []) => {
+        const { id, name } = data.id;
+        try {
+            const isExistUser = await User.findById(id);
+            if (!isExistUser) {
+                const hashPassword = bcrypt.create(id);
                 const newUser = new User({
-                    _id: data._id,
+                    _id: id,
+                    name: name,
                     role_id: role_id,
-                    password: hashPassword
+                    password: hashPassword,
+                    class: classes
                 })
-                newUser.save((err, user) => {
-                    if (err) return console.log(err);
-
-                    console.log(`Create user ${user._id} completely!`);
-                    return {
-                        success: true
-                    }
-
-                })
+                return newUser.save(err => !err);
             }
             else {
-                return {
-                    success: false
-                }
+                const classes = isExistUser.class.slice();
+                classes.push(..._classes)
+                isExistUser.set({
+                    class: classes
+                });
+                return isExistUser.save(err => !err)
             }
         }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
     },
+
     delete: async (_id) => {
         try {
             const result = await User.deleteOne({ _id: _id });
@@ -44,6 +43,7 @@ module.exports = {
             return false;
         }
     },
+
     updateStudent: async (_id, _student) => {
         try {
             const Student = await User.findById(_id);

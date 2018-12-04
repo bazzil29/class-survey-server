@@ -9,6 +9,7 @@ router.put('/teachers/:teacherid', token.verify, admin.updateUser);
 router.post('/students', token.verify);
 router.post('/teacher', token.verify);
 router.get('/classes', token.verify, admin.getClasses);
+router.post('/classes', token.verify, admin.addClass);
 
 
 module.exports = router;
