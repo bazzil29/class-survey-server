@@ -30,7 +30,7 @@ app.use('/teachers', teacherRoute);
 //student route
 app.use('/students', studentRoute);
 //admid route
-app.use('/admin', adminRoute);
+app.use('/admins', adminRoute);
 
 
 server.listen(port, () => {

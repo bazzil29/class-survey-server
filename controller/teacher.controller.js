@@ -1,5 +1,5 @@
 const User = require('../models/users.models');
-const ClassSurvey = require('../models/classSurvey.models');
+const ClassSurvey = require('../models/classSurvey.model');
 
 module.exports = {
     getClasses: async (req, res) => {

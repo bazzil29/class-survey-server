@@ -43,5 +43,35 @@ module.exports = {
             console.log(err);
             return false;
         }
+    },
+    updateStudent: async (_id, _student) => {
+        try {
+            const Student = await User.findById(_id);
+            const { name } = _student;
+            const classes = _student.class;
+            if (classes) {
+                let hadClass = [];
+                for (let i = 0; i < classes.length; i++) {
+                    for (let j = 0; j < Student.class.length; j++) {
+                        if (classes[i].id === Student.class[j].id) {
+                            hadClass.push(classes[j]);
+                        }
+                    }
+                }
+
+                hadClass.forEach(e => {
+                    console.log(e);
+                })
+
+                const notHaveClass = _student.class.filter(e => !hadClass.includes(e));
+
+                console.log(notHaveClass);
+            }
+            return true;
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
     }
 }
