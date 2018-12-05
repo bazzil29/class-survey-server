@@ -7,6 +7,6 @@ const studentSurveySchema = new mongoose.Schema({
     group_fields: Object
 })
 
-const Survey = mongoose.model('Survey', studentSurveySchema, 'student_survey');
+const StudentSurvey = mongoose.model('Survey', studentSurveySchema, 'student_survey');
 
-module.exports = Survey;
+module.exports = StudentSurvey;

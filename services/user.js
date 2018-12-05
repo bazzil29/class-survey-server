@@ -1,22 +1,25 @@
 const User = require("../models/users.models");
 const JWT = require("./jwt");
 const bcrypt = require('../services/bcrypt');
+const surveyServices = require('./survey');
 
 module.exports = {
-    create: async (data, role_id, _classes = []) => {
-        const { id, name } = data.id;
+    createTeacher: async (data, _classes = []) => {
+        const { id, name } = data;
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
-                const hashPassword = bcrypt.create(id);
+                const hashPassword = bcrypt.create(id.toString());
                 const newUser = new User({
                     _id: id,
                     name: name,
-                    role_id: role_id,
+                    role_id: 2,
                     password: hashPassword,
-                    class: classes
-                })
+                    class: _classes
+                });
+
                 return newUser.save(err => !err);
+
             }
             else {
                 const classes = isExistUser.class.slice();
@@ -32,6 +35,50 @@ module.exports = {
             return false;
         }
     },
+
+
+    createStudent: async (data, _classes) => {
+        const { id, name } = data;
+        try {
+            const isExistUser = await User.findById(id);
+            if (!isExistUser) {
+                const hashPassword = bcrypt.create(id.toString());
+                const classes = _classes.map(e => {
+                    return {
+                        id: e,
+                        survey_student: surveyServices.createStudentSurvey()
+                    }
+                })
+                const newUser = new User({
+                    _id: id,
+                    name: name,
+                    role_id: 3,
+                    password: hashPassword,
+                    class: classes
+                });
+                return newUser.save(err => !err);
+            }
+            else {
+                const classes = isExistUser.class.slice();
+                const classesTmp = _classes.map(e => {
+                    return {
+                        id: e,
+                        survey_student: surveyServices.createStudentSurvey()
+                    }
+                })
+                classes.push(...classesTmp)
+                isExistUser.set({
+                    class: classes
+                });
+                return isExistUser.save(err => !err)
+            }
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    },
+
 
     delete: async (_id) => {
         try {

@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const classSchema = new mongoose.Schema({
     _id: String,
     name: String,
+    place: String,
+    count_credit: Number,
     teacher: String,
     survey_id: Number,
     students: Array

@@ -1,6 +1,7 @@
 const userSevices = require('../services/user');
 const Class = require('../models/class.model');
 const User = require('../models/users.models');
+const surveyServices = require('../services/survey');
 module.exports = {
     updateUser: (req, res) => {
         if (req.body.role_id === 1) {
@@ -41,17 +42,28 @@ module.exports = {
 
     addClass: async (req, res) => {
         try {
-            const classes = await Class.find({});
-            const { id, teacher, name, students, place, count_credit } = req.body;
+            const { id, teacher, name, students, place, count_credit } = req.body.data;
             const isExistClass = await Class.findById(id);
             if (!isExistClass) {
-                userSevices.create(teacher, 2, [id]);
+                userSevices.createTeacher(teacher, [id]);
                 for (let i = 0; i < students.length; i++) {
-                    userSevices.create(students[i], 3, [id])
+                    userSevices.createStudent(students[i], [id])
                 }
-                /* 
-                *@todo lam tiep phan xu ly survey khi them
-                */
+                const newClass = new Class({
+                    _id: id,
+                    name: name,
+                    place: place,
+                    count_credit: count_credit,
+                    teacher: teacher.id,
+                    survey_id: await surveyServices.createSurvey(1, id),
+                    students: students
+                })
+                newClass.save(err => {
+                    console.log(err);
+                    res.send({
+                        success: !err
+                    })
+                });
             }
             else {
                 res.send({
