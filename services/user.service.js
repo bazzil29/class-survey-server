@@ -1,7 +1,7 @@
 const User = require("../models/users.models");
 const JWT = require("./jwt");
-const bcrypt = require('../services/bcrypt');
-const surveyServices = require('./survey');
+const bcrypt = require('./bcrypt');
+const surveyServices = require('./survey.service');
 
 module.exports = {
     createTeacher: async (data, _classes = []) => {

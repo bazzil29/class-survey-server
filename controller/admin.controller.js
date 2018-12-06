@@ -1,7 +1,12 @@
-const userSevices = require('../services/user');
+const userSevices = require('../services/user.service');
 const Class = require('../models/class.model');
 const User = require('../models/users.models');
-const surveyServices = require('../services/survey');
+const surveyServices = require('../services/survey.service');
+
+const fileHandler = require('../services/xlxsHandler');
+
+const fs = require('fs');
+
 module.exports = {
     updateUser: (req, res) => {
         if (req.body.role_id === 1) {
@@ -42,7 +47,8 @@ module.exports = {
 
     addClass: async (req, res) => {
         try {
-            const { id, teacher, name, students, place, count_credit } = req.body.data;
+            const { id, teacher, name, students, place, count_credit } = fileHandler.hanlde(req.file.path);
+            fs.unlink(req.file.path);
             const isExistClass = await Class.findById(id);
             if (!isExistClass) {
                 userSevices.createTeacher(teacher, [id]);
