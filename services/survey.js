@@ -46,7 +46,10 @@ module.exports = {
             modify_at: date,
             group_fields: groupFields
         });
-        return newStudentSurvey.save(err => err ? !err : uuid)
+        let result = null;
+        newStudentSurvey.save(err => err ? !err : err);
+        return uuid;
+
     },
 
     createSurvey: async (type = 1, id) => {
@@ -71,7 +74,8 @@ module.exports = {
             survey_template: type
         })
 
-        return newSurvey.save(err => !err)
+        newSurvey.save(err => err ? !err : err);
+        return id;
     }
 
 }

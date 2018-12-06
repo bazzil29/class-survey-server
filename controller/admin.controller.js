@@ -55,11 +55,11 @@ module.exports = {
                     place: place,
                     count_credit: count_credit,
                     teacher: teacher.id,
-                    survey_id: await surveyServices.createSurvey(1, id),
+                    survey_id: id,
                     students: students
                 })
+                surveyServices.createSurvey(1, id);
                 newClass.save(err => {
-                    console.log(err);
                     res.send({
                         success: !err
                     })

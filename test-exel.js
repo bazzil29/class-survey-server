@@ -16,8 +16,8 @@ var count_credit = worksheet['F9'].v;
 var place = worksheet['F8'].v;
 var students = [];
 var teacher = {
-    id: worksheet['C7'].v,
-    name: worksheet['E7'].v
+    id: worksheet['E7'].v,
+    name: worksheet['C7'].v
 }
 
 var headers = {
@@ -46,10 +46,10 @@ for (let R = 11; ; R++) {
 students.shift();
 
 var result = {
-    class: id,
+    id: id,
     name: name,
     teacher: teacher,
-    credit: count_credit,
+    count_credit: count_credit,
     place: place,
     students: students
 };

@@ -43,12 +43,14 @@ module.exports = {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
                 const hashPassword = bcrypt.create(id.toString());
-                const classes = _classes.map(e => {
-                    return {
-                        id: e,
-                        survey_student: surveyServices.createStudentSurvey()
-                    }
-                })
+                let classes = [];
+                for (let i = 0; i < _classes.length; i++) {
+                    const survey_student = await surveyServices.createStudentSurvey();
+                    classes.push({
+                        id: _classes[i],
+                        survey_student: survey_student
+                    });
+                }
                 const newUser = new User({
                     _id: id,
                     name: name,
@@ -60,17 +62,17 @@ module.exports = {
             }
             else {
                 const classes = isExistUser.class.slice();
-                const classesTmp = _classes.map(e => {
-                    return {
-                        id: e,
-                        survey_student: surveyServices.createStudentSurvey()
-                    }
-                })
-                classes.push(...classesTmp)
+                for (let i = 0; i < _classes.length; i++) {
+                    const survey_student = await surveyServices.createStudentSurvey();
+                    classes.push({
+                        id: _classes[i],
+                        survey_student: survey_student
+                    });
+                }
                 isExistUser.set({
                     class: classes
                 });
-                return isExistUser.save(err => !err)
+                return isExistUser.save(err => err)
             }
         }
         catch (err) {

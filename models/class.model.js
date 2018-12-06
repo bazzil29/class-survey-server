@@ -6,7 +6,7 @@ const classSchema = new mongoose.Schema({
     place: String,
     count_credit: Number,
     teacher: String,
-    survey_id: Number,
+    survey_id: String,
     students: Array
 })
 
