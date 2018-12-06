@@ -29,7 +29,7 @@ const renderValue = (field) => {
 
 
 module.exports = {
-    createStudentSurvey: async (type = 1) => {
+    createStudentSurvey: async (type = 1, _classId) => {
         let groupFields = [];
         try {
             const template = await SurveyTemplate.findById(type);
@@ -42,6 +42,7 @@ module.exports = {
         const uuid = uuidv4();
         const newStudentSurvey = new StudentSurvey({
             _id: uuid,
+            class: _classId,
             create_at: date,
             modify_at: date,
             group_fields: groupFields

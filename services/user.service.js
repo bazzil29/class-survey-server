@@ -45,7 +45,7 @@ module.exports = {
                 const hashPassword = bcrypt.create(id.toString());
                 let classes = [];
                 for (let i = 0; i < _classes.length; i++) {
-                    const survey_student = await surveyServices.createStudentSurvey();
+                    const survey_student = await surveyServices.createStudentSurvey(1, _classes[i]);
                     classes.push({
                         id: _classes[i],
                         survey_student: survey_student
@@ -63,7 +63,7 @@ module.exports = {
             else {
                 const classes = isExistUser.class.slice();
                 for (let i = 0; i < _classes.length; i++) {
-                    const survey_student = await surveyServices.createStudentSurvey();
+                    const survey_student = await surveyServices.createStudentSurvey(1, _classes[i]);
                     classes.push({
                         id: _classes[i],
                         survey_student: survey_student

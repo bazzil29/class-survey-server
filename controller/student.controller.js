@@ -7,7 +7,7 @@ module.exports = {
         const { studentId } = req.params;
         const { _id, role_id } = req.body;
         const student = await User.findById(_id);
-        if (student && student.role_id === role_id && role_id === 3 && _id === studentId) {
+        if (role_id === 1 || (role_id === 3 && _id === studentId)) {
             const classes = student.class;
             res.send({
                 success: true,
@@ -29,11 +29,14 @@ module.exports = {
         const { _id, role_id } = req.body;
         const student = await User.findById(studentId);
         try {
-            if (student && student.role_id === role_id && role_id === 3 && _id === studentId) {
-                const classTmp = student.class.find(e => {
+            if (role_id === 1 || (role_id === 3 && _id === studentId)) {
+
+                const isExistClass = student.class.find(e => {
                     return e.id === classId;
                 });
-                const survey = await StudentSurvey.findById(classTmp.survey_student);
+
+                const survey = await StudentSurvey.findById(isExistClass.survey_student);
+
                 if (survey) {
                     res.send({
                         success: true,
@@ -69,7 +72,7 @@ module.exports = {
         const { _id, role_id, survey: surveyReq } = req.body;
         const student = await User.findById(studentId);
         try {
-            if (student && student.role_id === role_id && role_id === 3 && _id === studentId) {
+            if (role_id === 1 || (role_id === 3 && _id === studentId)) {
                 const classTmp = student.class.find(e => {
                     return e.id === classId;
                 });

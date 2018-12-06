@@ -2,12 +2,14 @@ const userSevices = require('../services/user.service');
 const Class = require('../models/class.model');
 const User = require('../models/users.models');
 const surveyServices = require('../services/survey.service');
+const Teacher = require('../models/teacher.model');
 
-const fileHandler = require('../services/xlxsHandler');
+const fileHandler = require('../services/xlsxHandler');
 
 const fs = require('fs');
 
 module.exports = {
+
     updateUser: (req, res) => {
         if (req.body.role_id === 1) {
             const { data } = req.body;
@@ -26,17 +28,68 @@ module.exports = {
             }
         }
     },
+
+    getStudents: (req, res) => {
+        const { role_id, _id } = req.body;
+        try {
+            const classes = Class.find({});
+            if (classes && role_id === 1) {
+                res.send({
+                    success: true,
+                    data: classes
+                })
+            }
+            else {
+                res.send({
+                    success: false,
+                    message: "User can't access this!"
+                })
+            }
+        }
+        catch (err) {
+            console.log(err);
+            res.send({
+                success: false,
+                message: "Classes not found!"
+            })
+        }
+    },
+
+    getTeachers: (req, res) => {
+        const { role_id, _id } = req.body;
+        try {
+            const teachers = Teacher.find({});
+            if (teachers && role_id === 1) {
+                res.send({
+                    success: true,
+                    data: teachers
+                })
+            } else {
+                res.send({
+                    success: false,
+                    message: "User can't access this!"
+                })
+            }
+        } catch (err) {
+            console.lof(err);
+            res.send({
+                success: false,
+                message: 'Teachers not found!'
+            })
+        }
+    },
+
+
     getClasses: async (req, res) => {
         try {
             const classes = await Class.find({});
-            if (classes)
+            if (classes && req.body.role_id === 1)
                 res.send({
                     success: true,
                     data: classes
                 })
         }
         catch (err) {
-            console.log(err);
             res.send({
                 success: false,
                 message: "error!"
@@ -47,7 +100,7 @@ module.exports = {
 
     addClass: async (req, res) => {
         try {
-            const { id, teacher, name, students, place, count_credit } = fileHandler.hanlde(req.file.path);
+            const { id, teacher, name, students, place, count_credit } = fileHandler.classFile(req.file.path);
             fs.unlink(req.file.path);
             const isExistClass = await Class.findById(id);
             if (!isExistClass) {
@@ -55,6 +108,7 @@ module.exports = {
                 for (let i = 0; i < students.length; i++) {
                     userSevices.createStudent(students[i], [id])
                 }
+
                 const newClass = new Class({
                     _id: id,
                     name: name,
@@ -64,6 +118,7 @@ module.exports = {
                     survey_id: id,
                     students: students
                 })
+
                 surveyServices.createSurvey(1, id);
                 newClass.save(err => {
                     res.send({

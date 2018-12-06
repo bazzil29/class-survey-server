@@ -7,7 +7,7 @@ var XLSX = require('xlsx');
 // console.log(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
 
 module.exports = {
-    hanlde: (filename) => {
+    classFile: (filename) => {
         var workbook = XLSX.readFile(filename);
 
         var worksheet = workbook.Sheets['DSLMH'];

@@ -7,7 +7,7 @@ module.exports = {
             const { teacherId } = req.params;
             const { _id, role_id } = req.body;
             const teacher = await User.findById(_id);
-            if (role_id === 2 && teacherId === _id) {
+            if (role_id === 1 || (role_id === 2 && teacherId === _id)) {
                 const classes = teacher.class;
                 res.send({
                     success: true,
@@ -38,7 +38,7 @@ module.exports = {
             const { _id, role_id } = req.body;
             const teacher = await User.findById(_id);
             const teacherClasses = teacher.class;
-            if (teacherId === _id && role_id === 2 && teacherClasses.includes(classId)) {
+            if (role_id === 1 || (role_id === 2 && teacherId === _id)) {
                 const classSurvey = await ClassSurvey.find({ class: classId });
                 res.send({
                     success: true,
