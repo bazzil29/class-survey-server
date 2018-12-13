@@ -29,14 +29,14 @@ module.exports = {
         }
     },
 
-    getStudents: (req, res) => {
+    getStudents: async (req, res) => {
         const { role_id, _id } = req.body;
         try {
-            const classes = Class.find({});
-            if (classes && role_id === 1) {
+            const students = await User.find({ role_id: 3 }, '_id name class base_class');
+            if (students && role_id === 1) {
                 res.send({
                     success: true,
-                    data: classes
+                    data: students
                 })
             }
             else {
@@ -50,15 +50,15 @@ module.exports = {
             console.log(err);
             res.send({
                 success: false,
-                message: "Classes not found!"
+                message: "Students not found!"
             })
         }
     },
 
-    getTeachers: (req, res) => {
+    getTeachers: async (req, res) => {
         const { role_id, _id } = req.body;
         try {
-            const teachers = Teacher.find({});
+            const teachers = await Teacher.find({ role_id: 2 }, '_id name class');
             if (teachers && role_id === 1) {
                 res.send({
                     success: true,
@@ -71,7 +71,7 @@ module.exports = {
                 })
             }
         } catch (err) {
-            console.lof(err);
+            console.log(err);
             res.send({
                 success: false,
                 message: 'Teachers not found!'

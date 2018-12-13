@@ -38,7 +38,7 @@ module.exports = {
 
 
     createStudent: async (data, _classes) => {
-        const { id, name } = data;
+        const { id, name, base_class, date_of_birth } = data;
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
@@ -56,7 +56,9 @@ module.exports = {
                     name: name,
                     role_id: 3,
                     password: hashPassword,
-                    class: classes
+                    class: classes,
+                    base_class: base_class,
+                    date_of_birth: date_of_birth
                 });
                 return newUser.save(err => !err);
             }
