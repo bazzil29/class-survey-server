@@ -7,7 +7,7 @@ const tokenChecker = require('../middleware/tokenChecker');
 const teacher = require('../controller/teacher.controller');
 
 
-router.get('/:teacherId/classes', tokenChecker.verify, teacher.getClasses);
-router.get('/:teacherId/classes/:classId/survey', tokenChecker.verify, teacher.getSurvey)
+router.get('/:teacherId/classes', tokenChecker.teacher, teacher.getClasses);
+router.get('/:teacherId/classes/:classId/survey', tokenChecker.teacher, teacher.getSurvey)
 
 module.exports = router;

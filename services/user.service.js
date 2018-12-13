@@ -36,18 +36,19 @@ module.exports = {
         }
     },
 
-
-    createStudent: async (data, _classes) => {
+    createStudent: async (data, _classes = []) => {
         const { id, name, base_class, date_of_birth } = data;
+        console.log(data);
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
                 const hashPassword = bcrypt.create(id.toString());
                 let classes = [];
                 for (let i = 0; i < _classes.length; i++) {
-                    const survey_student = await surveyServices.createStudentSurvey(1, _classes[i]);
+                    const survey_student = await surveyServices.createStudentSurvey(1, _classes[i].id);
                     classes.push({
-                        id: _classes[i],
+                        name: _classes[i].name,
+                        id: _classes[i].id,
                         survey_student: survey_student
                     });
                 }
@@ -67,7 +68,8 @@ module.exports = {
                 for (let i = 0; i < _classes.length; i++) {
                     const survey_student = await surveyServices.createStudentSurvey(1, _classes[i]);
                     classes.push({
-                        id: _classes[i],
+                        name: _classes[i].name,
+                        id: _classes[i].id,
                         survey_student: survey_student
                     });
                 }
@@ -82,7 +84,6 @@ module.exports = {
             return false;
         }
     },
-
 
     delete: async (_id) => {
         try {

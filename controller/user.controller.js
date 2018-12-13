@@ -23,7 +23,8 @@ module.exports = {
                 success: true,
                 message: "Login success!",
                 data: {
-                    token: token
+                    token: token,
+                    role_id: user.role_id
                 }
             })
         } catch (err) {
@@ -40,26 +41,30 @@ module.exports = {
             const { _id, oldPassword, newPassword } = req.body;
             const user = await User.findById(_id);
             if (user) {
-
                 if (bcrypt.verify(oldPassword, user.password)) {
                     user.set({
                         password: bcrypt.create(newPassword)
                     });
                     user.save();
-                    res.status(200).send({
+                    res.send({
                         success: true,
                         message: "Change password completely!"
                     })
+                } else {
+                    res.send({
+                        success: false,
+                        message: "Old password is wrong!"
+                    })
                 }
-            } {
-                res.status(401).send({
+            } else {
+                res.send({
                     success: false,
                     message: "Not found user!"
                 })
             }
         }
         catch (err) {
-            res.status(401).send({
+            res.send({
                 success: false,
                 message: "Not found user!"
             })
@@ -74,10 +79,12 @@ module.exports = {
                 res.send({
                     success: true,
                     data: {
-                        profileDetails: {
-                            name: user.name,
-                            _id: user._id
-                        }
+
+                        name: user.name,
+                        _id: user._id,
+                        date_of_birth: user.date_of_birth,
+                        base_class: user.base_class,
+                        class: user.name
                     }
                 })
             }

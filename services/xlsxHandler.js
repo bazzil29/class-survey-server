@@ -8,6 +8,7 @@ var XLSX = require('xlsx');
 
 module.exports = {
     classFile: (filename) => {
+
         var workbook = XLSX.readFile(filename);
 
         var worksheet = workbook.Sheets['DSLMH'];
@@ -57,6 +58,79 @@ module.exports = {
         };
 
         return result;
+
+    },
+
+    teacherFile: (filename) => {
+        const workbook = XLSX.readFile(filename);
+
+        const worksheet = workbook.Sheets['Sheet1'];
+        const teachers = [];
+
+        const headers = {
+            '0': 'stt',
+            '1': 'id',
+            '2': 'password',
+            '3': 'name',
+            '4': 'email'
+        }
+        try {
+            if (worksheet['A1'].v === 'STT' && !worksheet['F1']) {
+                for (let R = 1; ; R++) {
+                    if (worksheet[XLSX.utils.encode_cell({ c: 0, r: R })]) {
+                        for (let i = 0; i < 4; i++) {
+                            if (!teachers[R - 1])
+                                teachers[R - 1] = {};
+
+                            teachers[R - 1][headers[i]] = worksheet[XLSX.utils.encode_cell({ c: i, r: R })].v
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            return teachers;
+        } catch (err) {
+            return null;
+        }
+    },
+
+    studentFile: (filename) => {
+        const workbook = XLSX.readFile(filename);
+
+        const worksheet = workbook.Sheets['Sheet1'];
+        const students = [];
+
+        const headers = {
+            '0': 'stt',
+            '1': 'id',
+            '2': 'password',
+            '3': 'name',
+            '4': 'email',
+            '5': 'base_class'
+        }
+        try {
+            if (worksheet['A1'].v === 'STT' && worksheet['F1'].v === 'Khóa đào tạo') {
+                for (let R = 1; ; R++) {
+                    if (worksheet[XLSX.utils.encode_cell({ c: 0, r: R })]) {
+                        for (let i = 0; i < 6; i++) {
+                            if (!students[R - 1])
+                                students[R - 1] = {};
+
+                            students[R - 1][headers[i]] = worksheet[XLSX.utils.encode_cell({ c: i, r: R })].v
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+            return students;
+        } catch (err) {
+            return null
+        }
+
+
 
     }
 }

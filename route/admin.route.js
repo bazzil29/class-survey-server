@@ -16,12 +16,18 @@ const xlxsFilter = function (req, file, cb) {
 
 const upload = multer({ dest: 'uploads', fileFilter: xlxsFilter });
 
-router.put('/students/:studentId', token.verify, admin.updateUser);
-router.put('/teachers/:teacherid', token.verify, admin.updateUser);
-router.get('/students', token.verify, admin.getStudents);
-router.get('/teachers', token.verify, admin.getTeachers);
-router.get('/classes', token.verify, admin.getClasses);
-router.post('/classes', token.verify, upload.single('xlsx'), admin.addClass);
+router.get('/students', token.admin, admin.getStudents);
+router.get('/students/:userId', token.admin, admin.getUser);
+router.put('/students/:studentId', token.admin, admin.updateUser);
+router.post('/students', token.admin, upload.any(), admin.addFileStudent);
+
+router.get('/teachers', token.admin, admin.getTeachers);
+router.put('/teachers/:teacherid', token.admin, admin.updateUser);
+router.post('/teachers', token.admin, upload.single('xlsx'), admin.addFileTeacher);
+
+
+router.get('/classes', token.admin, admin.getClasses);
+router.post('/classes', token.admin, upload.single('xlsx'), admin.addClass);
 
 module.exports = router;
 

@@ -29,20 +29,36 @@ module.exports = {
         }
     },
 
-    getStudents: async (req, res) => {
-        const { role_id, _id } = req.body;
+    getUser: async (req, res) => {
+        const { userId } = req.params;
         try {
-            const students = await User.find({ role_id: 3 }, '_id name class base_class');
-            if (students && role_id === 1) {
+            const user = await User.findById(userId);
+            if (user) {
+                res.send({
+                    success: true,
+                    data: user
+                })
+            } else {
+                res.send({
+                    success: false,
+                    message: "User not found!"
+                })
+            }
+        } catch (err) {
+            console.log(err);
+            res.send({
+                success: false,
+                message: "Err!"
+            })
+        }
+    },
+    getStudents: async (req, res) => {
+        try {
+            const students = await User.find({ role_id: 3 }, '_id name class base_class date_of_birth');
+            if (students) {
                 res.send({
                     success: true,
                     data: students
-                })
-            }
-            else {
-                res.send({
-                    success: false,
-                    message: "User can't access this!"
                 })
             }
         }
@@ -56,18 +72,12 @@ module.exports = {
     },
 
     getTeachers: async (req, res) => {
-        const { role_id, _id } = req.body;
         try {
             const teachers = await Teacher.find({ role_id: 2 }, '_id name class');
-            if (teachers && role_id === 1) {
+            if (teachers) {
                 res.send({
                     success: true,
                     data: teachers
-                })
-            } else {
-                res.send({
-                    success: false,
-                    message: "User can't access this!"
                 })
             }
         } catch (err) {
@@ -83,7 +93,7 @@ module.exports = {
     getClasses: async (req, res) => {
         try {
             const classes = await Class.find({});
-            if (classes && req.body.role_id === 1)
+            if (classes)
                 res.send({
                     success: true,
                     data: classes
@@ -100,13 +110,14 @@ module.exports = {
 
     addClass: async (req, res) => {
         try {
+
             const { id, teacher, name, students, place, count_credit } = fileHandler.classFile(req.file.path);
             fs.unlink(req.file.path);
             const isExistClass = await Class.findById(id);
             if (!isExistClass) {
-                userSevices.createTeacher(teacher, [id]);
+                userSevices.createTeacher(teacher, [{ id, name }]);
                 for (let i = 0; i < students.length; i++) {
-                    userSevices.createStudent(students[i], [id])
+                    userSevices.createStudent(students[i], [{ id, name }])
                 }
 
                 const newClass = new Class({
@@ -135,6 +146,47 @@ module.exports = {
         }
         catch (err) {
             console.log(err);
+            res.send({
+                success: false,
+                message: "nofile!"
+            })
         }
-    }
+    },
+
+    addFileTeacher: async (req, res) => {
+        const teachers = fileHandler.teacherFile(req.file.path);
+        fs.unlink(req.file.path);
+        if (teachers) {
+            teachers.forEach(e => {
+                userSevices.createTeacher(e)
+            });
+            res.send({
+                success: true
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "no file"
+            })
+        }
+    },
+
+    addFileStudent: async (req, res) => {
+        const students = fileHandler.studentFile(req.files[0].path);
+        fs.unlink(req.files[0].path);
+
+        if (students) {
+            students.forEach(e => {
+                userSevices.createStudent(e)
+            });
+            res.send({
+                success: true
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "No file"
+            })
+        }
+    },
 }
