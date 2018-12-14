@@ -5,17 +5,20 @@ const surveyServices = require('./survey.service');
 
 module.exports = {
     createTeacher: async (data, _classes = []) => {
-        const { id, name } = data;
+        const { id, name, email, password } = data;
+        console.log(password);
+        console.log(email);
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
-                const hashPassword = bcrypt.create(id.toString());
+                const hashPassword = bcrypt.create(password.toString());
                 const newUser = new User({
                     _id: id,
                     name: name,
                     role_id: 2,
                     password: hashPassword,
-                    class: _classes
+                    class: _classes,
+                    email: email
                 });
 
                 return newUser.save(err => !err);
@@ -37,12 +40,11 @@ module.exports = {
     },
 
     createStudent: async (data, _classes = []) => {
-        const { id, name, base_class, date_of_birth } = data;
-        console.log(data);
+        const { id, name, base_class, date_of_birth, email, password } = data;
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
-                const hashPassword = bcrypt.create(id.toString());
+                const hashPassword = bcrypt.create(password.toString());
                 let classes = [];
                 for (let i = 0; i < _classes.length; i++) {
                     const survey_student = await surveyServices.createStudentSurvey(1, _classes[i].id);
@@ -59,7 +61,8 @@ module.exports = {
                     password: hashPassword,
                     class: classes,
                     base_class: base_class,
-                    date_of_birth: date_of_birth
+                    date_of_birth: date_of_birth,
+                    email: email
                 });
                 return newUser.save(err => !err);
             }

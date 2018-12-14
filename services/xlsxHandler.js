@@ -32,32 +32,42 @@ module.exports = {
             '5': 'note'
         }
 
-        for (let R = 11; ; R++) {
-            if (worksheet[XLSX.utils.encode_cell({ c: 0, r: R })]) {
-                for (let C = 0; C <= 4; C++) {
-                    let cell_addr = { c: C, r: R };
+        try {
+            if (worksheet['A1'].v !== 'STT') {
+                for (let R = 11; ; R++) {
+                    if (worksheet[XLSX.utils.encode_cell({ c: 0, r: R })]) {
+                        for (let C = 0; C <= 4; C++) {
+                            let cell_addr = { c: C, r: R };
 
-                    if (!students[R - 10])
-                        students[R - 10] = {};
+                            if (!students[R - 10])
+                                students[R - 10] = {};
 
-                    students[R - 10][headers[C]] = worksheet[XLSX.utils.encode_cell(cell_addr)].v;
+                            students[R - 10][headers[C]] = worksheet[XLSX.utils.encode_cell(cell_addr)].v;
+                        }
+                    } else break;
+
                 }
-            } else break;
 
+                students.shift();
+
+                var result = {
+                    id: id,
+                    name: name,
+                    teacher: teacher,
+                    count_credit: count_credit,
+                    place: place,
+                    students: students
+                };
+
+                return result;
+            } else {
+                return null
+            }
+        } catch (err) {
+            console.log(err);
+            return null;
         }
 
-        students.shift();
-
-        var result = {
-            id: id,
-            name: name,
-            teacher: teacher,
-            count_credit: count_credit,
-            place: place,
-            students: students
-        };
-
-        return result;
 
     },
 
@@ -78,7 +88,7 @@ module.exports = {
             if (worksheet['A1'].v === 'STT' && !worksheet['F1']) {
                 for (let R = 1; ; R++) {
                     if (worksheet[XLSX.utils.encode_cell({ c: 0, r: R })]) {
-                        for (let i = 0; i < 4; i++) {
+                        for (let i = 0; i < 5; i++) {
                             if (!teachers[R - 1])
                                 teachers[R - 1] = {};
 
@@ -88,9 +98,10 @@ module.exports = {
                         break;
                     }
                 }
+                return teachers === [] ? null : teachers;
+            } else {
+                return null;
             }
-
-            return teachers;
         } catch (err) {
             return null;
         }
@@ -124,14 +135,13 @@ module.exports = {
                         break;
                     }
                 }
+                return students === [] ? null : students;
+            } else {
+                return null;
             }
-            return students;
         } catch (err) {
             return null
         }
-
-
-
     }
 }
 

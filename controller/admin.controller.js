@@ -111,8 +111,8 @@ module.exports = {
     addClass: async (req, res) => {
         try {
 
-            const { id, teacher, name, students, place, count_credit } = fileHandler.classFile(req.file.path);
-            fs.unlink(req.file.path);
+            const { id, teacher, name, students, place, count_credit } = fileHandler.classFile(req.files[0].path);
+            fs.unlink(req.files[0].path);
             const isExistClass = await Class.findById(id);
             if (!isExistClass) {
                 userSevices.createTeacher(teacher, [{ id, name }]);
@@ -154,8 +154,8 @@ module.exports = {
     },
 
     addFileTeacher: async (req, res) => {
-        const teachers = fileHandler.teacherFile(req.file.path);
-        fs.unlink(req.file.path);
+        const teachers = fileHandler.teacherFile(req.files[0].path);
+        fs.unlink(req.files[0].path);
         if (teachers) {
             teachers.forEach(e => {
                 userSevices.createTeacher(e)

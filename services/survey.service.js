@@ -43,8 +43,8 @@ module.exports = {
         const newStudentSurvey = new StudentSurvey({
             _id: uuid,
             class: _classId,
-            create_at: date,
-            modify_at: date,
+            create_at: date.getDate(),
+            modify_at: date.getDate(),
             group_fields: groupFields
         });
         let result = null;
@@ -63,12 +63,14 @@ module.exports = {
         catch (err) {
             console.log(err);
         }
-
+        const d = new Date();
+        const deadline = d.setDate(d.getDate() + 15);
         const newSurvey = new Survey({
             _id: id,
             class: id,
-            create_at: new Date(),
-            last_modify: new Date(),
+            create_at: d.getDate(),
+            last_modify: d.getDate(),
+            deadline: deadline,
             value: {
                 group_fields: groupFields.map(e => renderValue(e))
             },

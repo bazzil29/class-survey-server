@@ -3,6 +3,7 @@ const User = require('../models/users.models');
 
 module.exports = {
     admin: async (req, res, next) => {
+        console.log(req.body);
         const { access_token } = req.headers;
         if (access_token) {
             try {
@@ -32,6 +33,7 @@ module.exports = {
         }
     },
     teacher: async (req, res, next) => {
+        console.log(req.body);
         const { access_token } = req.headers;
         if (access_token) {
             try {
@@ -61,6 +63,7 @@ module.exports = {
         }
     },
     student: async (req, res, next) => {
+        console.log(req.body);
         const { access_token } = req.headers;
         if (access_token) {
             try {
@@ -90,6 +93,7 @@ module.exports = {
         }
     },
     user: async (req, res, next) => {
+        console.log(req.body);
         const { access_token } = req.headers;
         if (access_token) {
             try {
