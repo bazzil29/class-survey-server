@@ -5,7 +5,7 @@ const surveySchema = mongoose.Schema({
     create_at: String,
     last_modify: String,
     deadline: String,
-    value: Object,
+    group_fields: Array,
     survey_template: String
 })
 

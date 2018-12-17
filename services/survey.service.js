@@ -70,21 +70,142 @@ module.exports = {
             console.log(err);
         }
         const d = new Date();
-        const deadline = d.setDate(d.getDate() + 15);
+        const date = d.getTime();
+        const deadline = d.setTime(d.getTime() + 60 * 60 * 1000 * 24 * 15);
         const newSurvey = new Survey({
             _id: id,
             class: id,
-            create_at: d.getTime(),
-            last_modify: d.getTime(),
+            create_at: date,
+            last_modify: date,
             deadline: deadline,
-            value: {
-                group_fields: groupFields.map(e => renderValue(e))
-            },
+            group_fields: groupFields.map(e => renderValue(e)),
             survey_template: type
         })
 
         newSurvey.save(err => err ? !err : err);
         return id;
+    },
+    assume: async (_class) => {
+        const regex = new RegExp(_class);
+        const studentSurveys = await StudentSurvey.find({ class: { $regex: regex } });
+        const result = [];
+
+        for (let j = 0; j < studentSurveys[0].group_fields.length; j++) {
+            result[j] = [];
+            for (let k = 0; k < studentSurveys[0].group_fields[j].fields.length; k++) {
+                result[j][k] = {
+                    total: 0,
+                    total_s: 0,
+                    count: studentSurveys.length,
+                    M: 0,
+                    STD: 0
+                }
+            }
+        }
+
+        for (let i = 0; i < studentSurveys.length; i++) {
+            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                    result[j][k].total += studentSurveys[i].group_fields[j].fields[k].value;
+                }
+            }
+        }
+
+
+
+        for (let j = 0; j < result.length; j++) {
+            for (let k = 0; k < result[j].length; k++) {
+                result[j][k].M = result[j][k].total / result[j][k].count;
+            }
+        }
+
+
+
+        for (let i = 0; i < studentSurveys.length; i++) {
+            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                    if (studentSurveys[i].group_fields[j].fields[k].value >= result[j][k].M) {
+                        result[j][k].total_s += Math.pow(Math.abs(studentSurveys[i].group_fields[j].fields[k].value - result[j][k].M), 2);
+
+                    } else {
+                        result[j][k].total_s += Math.pow(result[j][k].M - studentSurveys[i].group_fields[j].fields[k].value, 2);
+                    }
+                }
+            }
+        }
+
+
+        for (let j = 0; j < result.length; j++) {
+            for (let k = 0; k < result[j].length; k++) {
+                result[j][k].STD = Math.sqrt(result[j][k].total_s / result[j][k].count);
+            }
+        }
+
+        return result;
+
+    },
+    assumeAll: async (_classes) => {
+        const studentSurveys = [];
+        for (let i = 0; i < _classes.length; i++) {
+            const regex = new RegExp(_classes[i].id);
+            const studentSurveysTmp = await StudentSurvey.find({ class: { $regex: regex } });
+            studentSurveys.push(...studentSurveysTmp);
+        }
+        const result = [];
+        console.log(studentSurveys);
+        for (let j = 0; j < studentSurveys[0].group_fields.length; j++) {
+            result[j] = [];
+            for (let k = 0; k < studentSurveys[0].group_fields[j].fields.length; k++) {
+                result[j][k] = {
+                    total: 0,
+                    total_s: 0,
+                    count: studentSurveys.length,
+                    M: 0,
+                    STD: 0
+                }
+            }
+        }
+
+        for (let i = 0; i < studentSurveys.length; i++) {
+            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                    result[j][k].total += studentSurveys[i].group_fields[j].fields[k].value;
+                }
+            }
+        }
+
+
+
+        for (let j = 0; j < result.length; j++) {
+            for (let k = 0; k < result[j].length; k++) {
+                result[j][k].M = result[j][k].total / result[j][k].count;
+            }
+        }
+
+
+
+        for (let i = 0; i < studentSurveys.length; i++) {
+            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                    if (studentSurveys[i].group_fields[j].fields[k].value >= result[j][k].M) {
+                        result[j][k].total_s += Math.pow(Math.abs(studentSurveys[i].group_fields[j].fields[k].value - result[j][k].M), 2);
+
+                    } else {
+                        result[j][k].total_s += Math.pow(result[j][k].M - studentSurveys[i].group_fields[j].fields[k].value, 2);
+                    }
+                }
+            }
+        }
+
+
+        for (let j = 0; j < result.length; j++) {
+            for (let k = 0; k < result[j].length; k++) {
+                result[j][k].STD = Math.sqrt(result[j][k].total_s / result[j][k].count);
+            }
+        }
+
+        return result;
+
     }
 
 }

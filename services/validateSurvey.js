@@ -1,6 +1,6 @@
 module.exports = {
     verify: (survey) => {
-        if (survey.create_at !== survey.modify_at) {
+        if (1) {
             let tmp = true;
             survey.group_fields.forEach(element => {
                 element.fields.forEach(e => {

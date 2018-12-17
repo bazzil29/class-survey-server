@@ -67,25 +67,54 @@ module.exports = {
         try {
             const { userId, classId } = req.params;
             const { survey: surveyReq } = req.body;
+            const classSameType = classId.split(' ')[0];
             const student = await User.findById(userId);
             const classTmp = student.class.find(e => {
                 return e.id === classId;
             });
             const surveyStudent = await StudentSurvey.findById(classTmp.survey_student);
-            const Survey = await Survey.find({ class: classId });
+            const classSurvey = await Survey.findById(classId);
+            const d = new Date();
             surveyStudent.set({
                 group_fields: surveyReq,
-                modify_at: new Date()
+                modify_at: d.getTime()
             })
 
             if (surveyChecker.verify(surveyStudent)) {
-                if (!err) {
-                    surveyStudent.save(err => {
-                        res.send({
-                            success: true
-                        })
+
+                surveyStudent.save(async err => {
+                    const class_temp = await Class.findById(classId);
+                    const teacher = await User.findById(class_temp.teacher);
+                    const result_1 = await surveyServices.assume(classSameType);
+                    const result = await surveyServices.assume(classId);
+                    const result_2 = await surveyServices.assumeAll(teacher.class)
+                    var group_fields = [];
+                    for (let i = 0; i < classSurvey.group_fields.length; i++) {
+                        group_fields[i] = {
+                            fields: [],
+                            title: classSurvey.group_fields[i].title
+                        };
+                        for (let j = 0; j < classSurvey.group_fields[i].fields.length; j++) {
+                            group_fields[i].fields[j] = {
+                                value: {},
+                                title: classSurvey.group_fields[i].fields[j].title
+                            }
+                            group_fields[i].fields[j].value.M = result[i][j].M;
+                            group_fields[i].fields[j].value.STD = result[i][j].STD;
+                            group_fields[i].fields[j].value.M1 = result_1[i][j].M;
+                            group_fields[i].fields[j].value.STD1 = result_1[i][j].STD;
+                            group_fields[i].fields[j].value.M2 = result_2[i][j].M;
+                            group_fields[i].fields[j].value.STD2 = result_2[i][j].STD;
+                        }
+                    }
+                    classSurvey.set({ group_fields: group_fields })
+                    await classSurvey.save();
+                    // console.log(classSurvey.group_fields[0].fields[0])
+                    res.send({
+                        success: true
                     })
-                }
+                })
+
 
             }
 
