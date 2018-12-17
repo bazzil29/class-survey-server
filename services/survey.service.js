@@ -43,8 +43,8 @@ module.exports = {
         const newStudentSurvey = new StudentSurvey({
             _id: uuid,
             class: _classId,
-            create_at: date.getDate(),
-            modify_at: date.getDate(),
+            create_at: date.getTime(),
+            modify_at: date.getTime(),
             group_fields: groupFields
         });
         let result = null;
@@ -52,6 +52,12 @@ module.exports = {
         return uuid;
 
     },
+
+    deleteStudentSurvey: async (id) => {
+        const result = await StudentSurvey.findByIdAndDelete(id);
+        return true;
+    }
+    ,
 
     createSurvey: async (type = 1, id) => {
 
@@ -68,8 +74,8 @@ module.exports = {
         const newSurvey = new Survey({
             _id: id,
             class: id,
-            create_at: d.getDate(),
-            last_modify: d.getDate(),
+            create_at: d.getTime(),
+            last_modify: d.getTime(),
             deadline: deadline,
             value: {
                 group_fields: groupFields.map(e => renderValue(e))

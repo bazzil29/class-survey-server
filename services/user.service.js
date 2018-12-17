@@ -11,7 +11,7 @@ module.exports = {
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
-                const hashPassword = bcrypt.create(password.toString());
+                const hashPassword = bcrypt.create(password ? password.toString() : id.toString());
                 const newUser = new User({
                     _id: id,
                     name: name,
@@ -44,7 +44,7 @@ module.exports = {
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
-                const hashPassword = bcrypt.create(password.toString());
+                const hashPassword = bcrypt.create(password ? password.toString() : id.toString());
                 let classes = [];
                 for (let i = 0; i < _classes.length; i++) {
                     const survey_student = await surveyServices.createStudentSurvey(1, _classes[i].id);
