@@ -34,7 +34,7 @@ app.use('/students', studentRoute);
 app.use('/admins', adminRoute);
 
 
-server.listen(port, () => {
+server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000, () => {
     console.log('Listening on port ' + port);
 });
 
