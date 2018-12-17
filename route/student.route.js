@@ -8,12 +8,12 @@ const identify = require('../middleware/identify');
 const student = require('../controller/student.controller');
 
 
-router.get('/:studentId/classes', tokenChecker.student, identify.verify, student.getClasses);
-router.get('/:studentId/classes/:classId/survey', tokenChecker.student, identify.verify, student.getSurvey);
+router.get('/:userId/classes', tokenChecker.student, identify.verify, student.getClasses);
+router.get('/:userId/classes/:classId/survey', tokenChecker.student, identify.verify, student.getSurvey);
 
-router.post('/:studentId/classes', tokenChecker.student, identify.verify, student.addClass);
-router.delete('/:studentId/classes', tokenChecker.student, identify.verify, student.deleteClass);
+router.post('/:userId/classes', tokenChecker.student, identify.verify, student.addClass);
+router.delete('/:userId/classes', tokenChecker.student, identify.verify, student.deleteClass);
 
-router.put('/:studentId/classes/:classId/survey', tokenChecker.student, identify.verify, student.updateSurvey)
+router.put('/:userId/classes/:classId/survey', tokenChecker.student, identify.verify, student.updateSurvey)
 
 module.exports = router;

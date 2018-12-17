@@ -18,11 +18,11 @@ const upload = multer({ dest: 'uploads', fileFilter: xlxsFilter });
 
 router.get('/students', token.admin, admin.getStudents);
 router.get('/students/:userId', token.admin, admin.getUser);
-router.put('/students/:studentId', token.admin, admin.updateUser);
+router.put('/students/:userId', token.admin, admin.updateUser);
 router.post('/students', token.admin, upload.any(), admin.addFileStudent);
 
 router.get('/teachers', token.admin, admin.getTeachers);
-router.put('/teachers/:teacherid', token.admin, admin.updateUser);
+router.put('/teachers/:userId', token.admin, admin.updateUser);
 router.post('/teachers', token.admin, upload.any(), admin.addFileTeacher);
 
 

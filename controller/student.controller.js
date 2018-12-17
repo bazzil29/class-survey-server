@@ -6,8 +6,8 @@ const Class = require('../models/class.model');
 const surveyServices = require('../services/survey.service');
 module.exports = {
     getClasses: async (req, res) => {
-        const { studentId } = req.params;
-        const student = await User.findById(studentId);
+        const { userId } = req.params;
+        const student = await User.findById(userId);
         if (student) {
             const classes = student.class;
             res.send({
@@ -26,8 +26,8 @@ module.exports = {
     },
 
     getSurvey: async (req, res) => {
-        const { studentId, classId } = req.params;
-        const student = await User.findById(studentId);
+        const { userId, classId } = req.params;
+        const student = await User.findById(userId);
         try {
             if (student) {
                 const isExistClass = student.class.find(e => {
@@ -64,63 +64,46 @@ module.exports = {
     },
 
     updateSurvey: async (req, res) => {
-        const { studentId, classId } = req.params;
-        const { _id, role_id, survey: surveyReq } = req.body;
-        const student = await User.findById(studentId);
         try {
-            if (role_id === 1 || (role_id === 3 && _id === studentId)) {
-                const classTmp = student.class.find(e => {
-                    return e.id === classId;
-                });
-                const survey = await StudentSurvey.findById(classTmp.survey_student);
-                if (survey) {
-                    if (surveyChecker.verify(surveyReq)) {
-                        try {
-                            survey.set({ ...surveyReq });
-                            survey.save();
-                            res.send({
-                                sucess: true
-                            })
-                        }
-                        catch (err) {
-                            console.log(err);
-                        }
+            const { userId, classId } = req.params;
+            const { survey: surveyReq } = req.body;
+            const student = await User.findById(userId);
+            const classTmp = student.class.find(e => {
+                return e.id === classId;
+            });
+            const surveyStudent = await StudentSurvey.findById(classTmp.survey_student);
+            const Survey = await Survey.find({ class: classId });
+            surveyStudent.set({
+                group_fields: surveyReq,
+                modify_at: new Date()
+            })
 
-                    }
-                    else {
+            if (surveyChecker.verify(surveyStudent)) {
+                if (!err) {
+                    surveyStudent.save(err => {
                         res.send({
-                            success: false,
-                            message: "Not suport this form of survey!"
+                            success: true
                         })
-                    }
-                }
-                else {
-                    res.send({
-                        success: false,
-                        message: "survey is not exist!"
                     })
                 }
 
-            } else {
-                res.send({
-                    success: false,
-                    message: "User not found or role id not correct! "
-                })
             }
+
         } catch (err) {
             console.log(err);
             res.send({
                 success: false,
-                message: "User can't access this!"
+                message: "Err"
             })
         }
+
 
     },
     addClass: async (req, res) => {
         const { _class } = req.body;
-        const { studentId } = req.params;
+        const { userId } = req.params;
         try {
-            const student = await User.findById(studentId);
+            const student = await User.findById(userId);
             if (student) {
                 const classes = student.class;
                 const isExist = classes.find((e) => {
@@ -167,9 +150,9 @@ module.exports = {
 
     deleteClass: async (req, res) => {
         const { _class } = req.body;
-        const { studentId } = req.params;
+        const { userId } = req.params;
         try {
-            const student = await User.findById(studentId);
+            const student = await User.findById(userId);
             if (student) {
                 const classes = student.class;
                 const isExist = classes.find((e) => {

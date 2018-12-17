@@ -13,8 +13,8 @@ module.exports = {
     updateUser: (req, res) => {
         if (req.body.role_id === 1) {
             const { data } = req.body;
-            const { studentId } = req.params;
-            if (userSevices.updateStudent(studentId, data)) {
+            const { userId } = req.params;
+            if (userSevices.updateStudent(userId, data)) {
                 res.send({
                     success: true,
                     message: "Update successed!"
