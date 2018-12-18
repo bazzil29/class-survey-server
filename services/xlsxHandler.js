@@ -42,7 +42,7 @@ module.exports = {
                             if (!students[R - 10])
                                 students[R - 10] = {};
 
-                            students[R - 10][headers[C]] = worksheet[XLSX.utils.encode_cell(cell_addr)].v.trim();
+                            students[R - 10][headers[C]] = worksheet[XLSX.utils.encode_cell(cell_addr)].v.toString().trim();
                         }
                     } else break;
 
@@ -92,7 +92,7 @@ module.exports = {
                             if (!teachers[R - 1])
                                 teachers[R - 1] = {};
 
-                            teachers[R - 1][headers[i]] = worksheet[XLSX.utils.encode_cell({ c: i, r: R })].v.trim()
+                            teachers[R - 1][headers[i]] = worksheet[XLSX.utils.encode_cell({ c: i, r: R })].v.toString().trim()
                         }
                     } else {
                         break;
@@ -129,7 +129,7 @@ module.exports = {
                             if (!students[R - 1])
                                 students[R - 1] = {};
 
-                            students[R - 1][headers[i]] = worksheet[XLSX.utils.encode_cell({ c: i, r: R })].v.trim();
+                            students[R - 1][headers[i]] = worksheet[XLSX.utils.encode_cell({ c: i, r: R })].v.toString().trim();
                         }
                     } else {
                         break;
