@@ -22,6 +22,9 @@ const mongoose = require('mongoose');
 mongoose.connect('mongodb://admin:a123456@ds045507.mlab.com:45507/class-survey-database');
 
 // Cross Origin Error
+app.get('/', (req, res) => {
+    res.json("HI ban");
+})
 app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.json());
 //user route
@@ -34,6 +37,9 @@ app.use('/students', studentRoute);
 app.use('/admins', adminRoute);
 
 
+// server.listen(5000, () => {
+//     console.log('Listening on port ' + 3000);
+// });
 server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000, () => {
     console.log('Listening on port ' + port);
 });
