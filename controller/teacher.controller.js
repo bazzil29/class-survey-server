@@ -59,14 +59,14 @@ module.exports = {
     addClass: async (req, res) => {
         try {
             const { userId } = req.params;
-            const { _class } = req.body;
+            const { classId } = req.body;
             const teacher = await User.findById(userId);
             const classes = teacher.class;
-            const isExistClassTeacher = classes.find(e => e.id === _class);
-            const isExistClass = await Class.findById(_class);
+            const isExistClassTeacher = classes.find(e => e.id === classId);
+            const isExistClass = await Class.findById(classId);
             if (isExistClass && !isExistClassTeacher) {
                 classes.push({
-                    id: _class,
+                    id: classId,
                     name: isExistClass.name
                 })
                 teacher.set({
@@ -96,14 +96,13 @@ module.exports = {
     },
     deleteClass: async (req, res) => {
         try {
-            const { userId } = req.params;
-            const { _class } = req.body;
+            const { userId, classId } = req.params;
             const teacher = await User.findById(userId);
             const classes = teacher.class;
-            const isExistClass = await Class.findById(_class);
+            const isExistClass = await Class.findById(classId);
             if (isExistClass && isExistClass.teacher !== userId) {
                 for (let i = 0; i < classes.length; i++) {
-                    if (classes[i].id === _class) {
+                    if (classes[i].id === classId) {
                         classes.splice(i, 1);
                         break;
                     }

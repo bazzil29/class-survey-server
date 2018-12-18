@@ -129,14 +129,14 @@ module.exports = {
 
     },
     addClass: async (req, res) => {
-        const { _class } = req.body;
+        const { classId } = req.body;
         const { userId } = req.params;
         try {
             const student = await User.findById(userId);
             if (student) {
                 const classes = student.class;
                 const isExist = classes.find((e) => {
-                    return e.id === _class;
+                    return e.id === classId;
                 });
 
                 if (isExist) {
@@ -145,14 +145,14 @@ module.exports = {
                         message: "Class had existed!"
                     })
                 }
-                const classTmp = await Class.findById(_class);
-                const survey = await Survey.findById(_class);
+                const classTmp = await Class.findById(classId);
+                const survey = await Survey.findById(classId);
                 if (survey && classTmp) {
-                    const survey_student = await surveyServices.createStudentSurvey(parseInt(survey.survey_template, 10), _class);
+                    const survey_student = await surveyServices.createStudentSurvey(parseInt(survey.survey_template, 10), classId);
                     const classes = student.class;
                     classes.push({
                         name: classTmp.name,
-                        id: _class,
+                        id: classId,
                         survey_student: survey_student
                     })
                     student.set({ class: classes });
@@ -178,14 +178,14 @@ module.exports = {
     },
 
     deleteClass: async (req, res) => {
-        const { _class } = req.body;
-        const { userId } = req.params;
+
+        const { userId, classId } = req.params;
         try {
             const student = await User.findById(userId);
             if (student) {
                 const classes = student.class;
                 const isExist = classes.find((e) => {
-                    return e.id === _class;
+                    return e.id === classId;
                 });
 
                 if (isExist) {

@@ -24,6 +24,7 @@ router.post('/students/file', token.admin, upload.any(), admin.addFileStudent);
 router.delete('/students/:userId', token.admin, admin.deleteStudent);
 
 router.get('/teachers', token.admin, admin.getTeachers);
+router.get('/teachers/:userId', token.admin, admin.getUser);
 router.put('/teachers/:userId', token.admin, admin.updateUser);
 router.post('/teachers', token.admin, upload.any(), admin.addTeacher);
 router.post('/teachers/file', token.admin, upload.any(), admin.addFileTeacher);
