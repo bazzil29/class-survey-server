@@ -22,7 +22,7 @@ const mongoose = require('mongoose');
 mongoose.connect('mongodb://admin:a123456@ds045507.mlab.com:45507/class-survey-database');
 
 // Cross Origin Error
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.json());
 //user route
 app.use('/users', userRoute);
