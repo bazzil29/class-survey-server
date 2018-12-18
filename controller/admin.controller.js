@@ -112,7 +112,7 @@ module.exports = {
         try {
 
             const { id, teacher, name, students, place, count_credit } = fileHandler.classFile(req.files[0].path);
-            fs.unlink(req.files[0].path);
+            // fs.unlink(req.files[0].path);
             const isExistClass = await Class.findById(id);
             if (!isExistClass) {
                 userSevices.createTeacher(teacher, [{ id, name }]);
