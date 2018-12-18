@@ -155,7 +155,7 @@ module.exports = {
 
     addFileTeacher: async (req, res) => {
         const teachers = fileHandler.teacherFile(req.files[0].path);
-        fs.unlink(req.files[0].path);
+        // fs.unlink(req.files[0].path);
         if (teachers) {
             teachers.forEach(e => {
                 userSevices.createTeacher(e)
@@ -173,7 +173,7 @@ module.exports = {
 
     addFileStudent: async (req, res) => {
         const students = fileHandler.studentFile(req.files[0].path);
-        fs.unlink(req.files[0].path);
+        // fs.unlink(req.files[0].path);
 
         if (students) {
             students.forEach(e => {
