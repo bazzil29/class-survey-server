@@ -1,8 +1,10 @@
 const userSevices = require('../services/user.service');
+const surveyServices = require('../services/survey.service');
+
 const Class = require('../models/class.model');
 const User = require('../models/users.models');
-const surveyServices = require('../services/survey.service');
 const Teacher = require('../models/teacher.model');
+const studentSurvey = require('../models/studentSurvey.model');
 
 const fileHandler = require('../services/xlsxHandler');
 
@@ -10,23 +12,33 @@ const fs = require('fs');
 
 module.exports = {
 
-    updateUser: (req, res) => {
-        if (req.body.role_id === 1) {
-            const { data } = req.body;
-            const { userId } = req.params;
-            if (userSevices.updateStudent(userId, data)) {
-                res.send({
-                    success: true,
-                    message: "Update successed!"
+    updateUser: async (req, res) => {
+        const { data } = req.body;
+        const { userId } = req.params;
+
+        try {
+            const user = await User.findById(userId);
+            if (user) {
+                user.set({
+                    name: data.name,
+                    base_class: data.base_class,
+                    date_of_birth: data.date_of_birth,
+                    email: data.email
+                })
+                user.save(err => {
+                    res.send({
+                        success: !err
+                    })
                 })
             }
-            else {
-                res.send({
-                    success: false,
-                    message: 'Update false!'
-                })
-            }
+        } catch (err) {
+            console.log(err);
+            res.send({
+                success: false,
+                message: "Err!"
+            })
         }
+
     },
 
     getUser: async (req, res) => {
@@ -52,6 +64,37 @@ module.exports = {
             })
         }
     },
+
+    addStudent: async (req, res) => {
+
+        const data = req.body.data;
+        if (userSevices.createStudent(data)) {
+            res.send({
+                success: true
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Err!"
+            })
+        };
+
+    },
+
+    addTeacher: async () => {
+        const data = req.body.data;
+        if (userSevices.createTeacher(data)) {
+            res.send({
+                success: true
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Err!"
+            })
+        };
+    },
+
     getStudents: async (req, res) => {
         try {
             const students = await User.find({ role_id: 3 }, '_id name class base_class date_of_birth');
@@ -71,6 +114,58 @@ module.exports = {
         }
     },
 
+    deleteStudent: async (req, res) => {
+        try {
+            const { userId } = req.params;
+            const student = await User.findById(userId);
+            if (student) {
+                student.class.forEach(async e => {
+                    await studentSurvey.findByIdAndDelete(e.survey_student);
+                })
+                if (await userSevices.delete(userId)) {
+                    res.send({
+                        success: true
+                    })
+                };
+            } else {
+                res.send({
+                    success: false,
+                    message: 'User not found!'
+                })
+            }
+        } catch (err) {
+            console.log(err);
+            res.send({
+                success: false,
+                message: 'Err!'
+            })
+        }
+    },
+    deleteTeacher: async (req, res) => {
+        try {
+            const { userId } = req.params;
+            const teacher = await User.findById(userId);
+            if (teacher) {
+                const classes = teacher.class;
+                if (classes.length !== 0) {
+                    res.send({
+                        success: false,
+                        message: "User still being teacher of some classes , please make other user becoems before"
+                    })
+                } else {
+                    res.send({
+                        success: true
+                    })
+                }
+            }
+        } catch (err) {
+            console.log(err);
+            res.send({
+                success: false,
+                message: 'Err!'
+            })
+        }
+    },
     getTeachers: async (req, res) => {
         try {
             const teachers = await Teacher.find({ role_id: 2 }, '_id name class email');

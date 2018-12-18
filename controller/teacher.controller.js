@@ -73,6 +73,10 @@ module.exports = {
                     class: classes
                 })
                 teacher.save();
+                isExistClass.set({
+                    teacher: userId
+                });
+                isExistClass.save();
                 res.send({
                     success: true
                 })
@@ -96,20 +100,29 @@ module.exports = {
             const { _class } = req.body;
             const teacher = await User.findById(userId);
             const classes = teacher.class;
-            for (let i = 0; i < classes.length; i++) {
-                if (classes[i].id === _class) {
-                    classes.splice(i, 1);
-                    break;
+            const isExistClass = await Class.findById(_class);
+            if (isExistClass && isExistClass.teacher !== userId) {
+                for (let i = 0; i < classes.length; i++) {
+                    if (classes[i].id === _class) {
+                        classes.splice(i, 1);
+                        break;
+                    }
                 }
-            }
-            teacher.set({
-                class: classes
-            })
-            teacher.save(err => {
-                res.send({
-                    success: !err
+                teacher.set({
+                    class: classes
                 })
-            })
+                teacher.save(err => {
+                    res.send({
+                        success: !err
+                    })
+                })
+            } else {
+                res.send({
+                    success: false,
+                    message: "User still being a teacher of this class , please make orther teacher becomes before!"
+                })
+            }
+
         } catch (err) {
             console.log(err);
         }
