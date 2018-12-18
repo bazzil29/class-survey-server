@@ -73,7 +73,7 @@ module.exports = {
 
     getTeachers: async (req, res) => {
         try {
-            const teachers = await Teacher.find({ role_id: 2 }, '_id name class');
+            const teachers = await Teacher.find({ role_id: 2 }, '_id name class email');
             if (teachers) {
                 res.send({
                     success: true,
