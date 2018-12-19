@@ -2,6 +2,20 @@ const User = require('../models/users.models');
 const ClassSurvey = require('../models/classSurvey.model');
 const Class = require('../models/class.model');
 module.exports = {
+    getTeachers: async (req, res) => {
+        const teachers = await User.find({ role_id: 2 }, '_id name class email');
+        if (teachers) {
+            res.send({
+                success: true,
+                data: teachers
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Users not found!"
+            })
+        }
+    },
     getClasses: async (req, res) => {
         try {
             const { userId } = req.params;
@@ -11,9 +25,7 @@ module.exports = {
                 const classes = teacher.class;
                 res.send({
                     success: true,
-                    data: {
-                        class: classes
-                    }
+                    data: classes
                 })
             }
             else {

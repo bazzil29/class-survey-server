@@ -5,6 +5,20 @@ const surveyChecker = require('../services/validateSurvey');
 const Class = require('../models/class.model');
 const surveyServices = require('../services/survey.service');
 module.exports = {
+    getStudents: async (req, res) => {
+        const students = await User.find({ role_id: 3 }, '_id name class base_class date_of_birth');
+        if (students) {
+            res.send({
+                success: true,
+                data: students
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Users not found!"
+            })
+        }
+    },
     getClasses: async (req, res) => {
         const { userId } = req.params;
         const student = await User.findById(userId);
@@ -12,9 +26,7 @@ module.exports = {
             const classes = student.class;
             res.send({
                 success: true,
-                data: {
-                    class: classes
-                }
+                data: classes
             })
         } else {
             res.send({

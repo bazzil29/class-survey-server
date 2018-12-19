@@ -7,6 +7,7 @@ const identify = require('../middleware/identify');
 //controller
 const student = require('../controller/student.controller');
 
+router.get('', tokenChecker.student, student.getStudents);
 //classes of student
 router.get('/:userId/classes', tokenChecker.student, identify.verify, student.getClasses);
 router.post('/:userId/classes', tokenChecker.student, identify.verify, student.addClass);
