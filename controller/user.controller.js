@@ -1,6 +1,7 @@
 const User = require('../models/users.models');
-const jwt = require('../services/jwt');
-const bcrypt = require('../services/bcrypt');
+const jwt = require('../common/jwt');
+const bcrypt = require('../common/bcrypt');
+const response = require('../common/response');
 
 module.exports = {
     test: (req, res) => {
@@ -19,20 +20,14 @@ module.exports = {
         try {
             const user = await User.findById(req.body.username);
             const token = jwt.create({ _id: user._id, role_id: user.role_id })
-            res.send({
-                success: true,
-                message: "Login success!",
-                data: {
-                    token: token,
-                    role_id: user.role_id
-                }
-            })
+            const data = {
+                token: token,
+                role_id: user.role_id
+            }
+            response.success(res, data, "Login success!")
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Err username or password",
-            })
+            response.false(res, "Wrong  password or username")
         }
     },
 
@@ -46,28 +41,16 @@ module.exports = {
                         password: bcrypt.create(newPassword)
                     });
                     user.save();
-                    res.send({
-                        success: true,
-                        message: "Change password completely!"
-                    })
+                    response.success(res, null, "Change password completely!");
                 } else {
-                    res.send({
-                        success: false,
-                        message: "Old password is wrong!"
-                    })
+                    response.false(res, "Old password is wrong!")
                 }
             } else {
-                res.send({
-                    success: false,
-                    message: "Not found user!"
-                })
+                response.false(res, "User not found !");
             }
         }
         catch (err) {
-            res.send({
-                success: false,
-                message: "Not found user!"
-            })
+            response.false(res, "User not found !");
         }
     },
 
@@ -76,31 +59,15 @@ module.exports = {
             const { _id } = req.body;
             const user = await User.findById(_id);
             if (user) {
-                res.send({
-                    success: true,
-                    data: {
-
-                        name: user.name,
-                        _id: user._id,
-                        date_of_birth: user.date_of_birth,
-                        base_class: user.base_class,
-                        class: user.name
-                    }
-                })
+                response.success(res, { ...user })
             }
             else {
-                res.send({
-                    success: false,
-                    message: "User not found!"
-                })
+                response.false(res, "User not found!");
             }
 
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: err
-            })
+            response.false(res, err);
         }
     }
 

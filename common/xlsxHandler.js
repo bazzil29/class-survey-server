@@ -1,11 +1,5 @@
 var XLSX = require('xlsx');
 
-// var workbook = XLSX.readFile('ds_tai_khoan_sinh_vien.xlsx');
-
-// var workbook = XLSX.readFile('ds_tai_khoan_canbo.xlsx');
-
-// console.log(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-
 module.exports = {
     classFile: (filename) => {
 

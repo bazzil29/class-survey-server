@@ -1,9 +1,9 @@
 const User = require('../models/users.models');
 const StudentSurvey = require('../models/studentSurvey.model');
 const Survey = require('../models/classSurvey.model');
-const surveyChecker = require('../services/validateSurvey');
+const surveyChecker = require('../common/validateSurvey');
 const Class = require('../models/class.model');
-const surveyServices = require('../services/survey.service');
+const surveyServices = require('./common/survey');
 module.exports = {
     getStudents: async (req, res) => {
         const students = await User.find({ role_id: 3 }, '_id name class base_class date_of_birth');
@@ -49,9 +49,7 @@ module.exports = {
                 if (survey) {
                     res.send({
                         success: true,
-                        data: {
-                            survey: survey
-                        }
+                        data: { survey: survey }
                     })
                 }
                 else {
@@ -122,9 +120,7 @@ module.exports = {
                     classSurvey.set({ group_fields: group_fields })
                     await classSurvey.save();
                     // console.log(classSurvey.group_fields[0].fields[0])
-                    res.send({
-                        success: true
-                    })
+                    res.send({ success: true })
                 })
 
 
@@ -169,9 +165,7 @@ module.exports = {
                     })
                     student.set({ class: classes });
                     student.save(err => {
-                        res.send({
-                            success: !err
-                        })
+                        res.send({ success: !err })
                     });
                 } else {
                     res.send({
@@ -201,7 +195,7 @@ module.exports = {
                 });
 
                 if (isExist) {
-                    classes.splice(classes.indexOf(isExist, 1));
+                    classes.splice(classes.indexOf(isExist), 1);
                     student.set({
                         class: classes
                     })

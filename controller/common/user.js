@@ -1,7 +1,7 @@
-const User = require("../models/users.models");
-const JWT = require("./jwt");
-const bcrypt = require('./bcrypt');
-const surveyServices = require('./survey.service');
+const User = require("../../models/users.models");
+const JWT = require("../../common/jwt");
+const bcrypt = require('../../common/bcrypt');
+const surveyServices = require('./survey');
 
 module.exports = {
     createTeacher: async (data, _classes = []) => {
@@ -67,7 +67,7 @@ module.exports = {
             else {
                 const classes = isExistUser.class.slice();
                 for (let i = 0; i < _classes.length; i++) {
-                    const survey_student = await surveyServices.createStudentSurvey(1, _classes[i]);
+                    const survey_student = await surveyServices.createStudentSurvey(1, _classes[i].id);
                     classes.push({
                         name: _classes[i].name,
                         id: _classes[i].id,

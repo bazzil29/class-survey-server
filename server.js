@@ -18,8 +18,8 @@ const port = 5000;
 
 const mongoose = require('mongoose');
 
-// mongoose.connect('mongodb://127.0.0.1:27017/class-survey-database');
-mongoose.connect('mongodb://admin:a123456@ds045507.mlab.com:45507/class-survey-database');
+mongoose.connect('mongodb://127.0.0.1:27017/class-survey-database');
+// mongoose.connect('mongodb://admin:a123456@ds045507.mlab.com:45507/class-survey-database');
 
 // Cross Origin Error
 app.get('/', (req, res) => {

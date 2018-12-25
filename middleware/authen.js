@@ -1,5 +1,5 @@
 const User = require('../models/users.models');
-const bcrypt = require('../services/bcrypt');
+const bcrypt = require('../common/bcrypt');
 module.exports = {
     verify: async (req, res, next) => {
         const user = await User.findById(req.body.username);

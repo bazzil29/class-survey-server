@@ -1,12 +1,14 @@
-const userSevices = require('../services/user.service');
-const surveyServices = require('../services/survey.service');
+const userSevices = require('./common/user');
+const surveyServices = require('./common/survey');
 
 const Class = require('../models/class.model');
 const User = require('../models/users.models');
 const Teacher = require('../models/teacher.model');
 const studentSurvey = require('../models/studentSurvey.model');
 
-const fileHandler = require('../services/xlsxHandler');
+const fileHandler = require('../common/xlsxHandler');
+const response = require('../common/response');
+
 
 const fs = require('fs');
 
@@ -26,17 +28,12 @@ module.exports = {
                     email: data.email
                 })
                 user.save(err => {
-                    res.send({
-                        success: !err
-                    })
+                    res.send({ success: !err })
                 })
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Err!"
-            })
+            response.false(res, err);
         }
 
     },
@@ -46,22 +43,13 @@ module.exports = {
         try {
             const user = await User.findById(userId);
             if (user) {
-                res.send({
-                    success: true,
-                    data: user
-                })
+                response.success(res, user);
             } else {
-                res.send({
-                    success: false,
-                    message: "User not found!"
-                })
+                response.false(res, "User not found!");
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Err!"
-            })
+            response.false(res, err);
         }
     },
 
@@ -69,14 +57,9 @@ module.exports = {
 
         const data = req.body.data;
         if (userSevices.createStudent(data)) {
-            res.send({
-                success: true
-            })
+            response.success(res);
         } else {
-            res.send({
-                success: false,
-                message: "Err!"
-            })
+            response.false(res, "Error!");
         };
 
     },
@@ -84,14 +67,9 @@ module.exports = {
     addTeacher: async () => {
         const data = req.body.data;
         if (userSevices.createTeacher(data)) {
-            res.send({
-                success: true
-            })
+            response.success(res);
         } else {
-            res.send({
-                success: false,
-                message: "Err!"
-            })
+            response.false(res, "err");
         };
     },
 
@@ -99,18 +77,11 @@ module.exports = {
         try {
             const students = await User.find({ role_id: 3 }, '_id name class base_class date_of_birth');
             if (students) {
-                res.send({
-                    success: true,
-                    data: students
-                })
+                response.success(res, students);
             }
         }
         catch (err) {
-            console.log(err);
-            res.send({
-                success: false,
-                message: "Students not found!"
-            })
+            response.false(res, "Students not found!");
         }
     },
 
@@ -123,22 +94,14 @@ module.exports = {
                     await studentSurvey.findByIdAndDelete(e.survey_student);
                 })
                 if (await userSevices.delete(userId)) {
-                    res.send({
-                        success: true
-                    })
+                    response.success(res);
                 };
             } else {
-                res.send({
-                    success: false,
-                    message: 'User not found!'
-                })
+                response.false(res, "User not found!");
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: 'Err!'
-            })
+            response.false(res, err);
         }
     },
     deleteTeacher: async (req, res) => {
@@ -148,39 +111,25 @@ module.exports = {
             if (teacher) {
                 const classes = teacher.class;
                 if (classes.length !== 0) {
-                    res.send({
-                        success: false,
-                        message: "User still being teacher of some classes , please make other user becoems before"
-                    })
+                    response.false(res, "User still being teacher of some classes , please make other user becoems before");
                 } else {
-                    res.send({
-                        success: true
-                    })
+                    response.success(res);
                 }
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: 'Err!'
-            })
+            response.false(res, err);
         }
     },
     getTeachers: async (req, res) => {
         try {
             const teachers = await Teacher.find({ role_id: 2 }, '_id name class email');
             if (teachers) {
-                res.send({
-                    success: true,
-                    data: teachers
-                })
+                response.success(res, teachers);
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: 'Teachers not found!'
-            })
+            response.false(res, err);
         }
     },
 
@@ -188,17 +137,14 @@ module.exports = {
     getClasses: async (req, res) => {
         try {
             const classes = await Class.find({});
-            if (classes)
-                res.send({
-                    success: true,
-                    data: classes
-                })
+            if (classes) {
+                response.success(res, classes)
+            } else {
+                response.false(res, "Error!");
+            }
         }
         catch (err) {
-            res.send({
-                success: false,
-                message: "error!"
-            })
+            response.false(res, err);
         }
 
     },
@@ -227,24 +173,16 @@ module.exports = {
 
                 surveyServices.createSurvey(1, id);
                 newClass.save(err => {
-                    res.send({
-                        success: !err
-                    })
+                    res.send({ success: !err })
                 });
             }
             else {
-                res.send({
-                    success: false,
-                    message: "Class has existed!"
-                })
+                response.false(res, "Class has existed!");
             }
         }
         catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "nofile!"
-            })
+            response.false(res, "nofile!");
         }
     },
 

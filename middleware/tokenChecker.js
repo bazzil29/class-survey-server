@@ -1,4 +1,4 @@
-const jwt = require('../services/jwt');
+const jwt = require('../common/jwt');
 const User = require('../models/users.models');
 
 module.exports = {
@@ -63,7 +63,6 @@ module.exports = {
         }
     },
     student: async (req, res, next) => {
-        console.log(req.body);
         const { access_token } = req.headers;
         if (access_token) {
             try {

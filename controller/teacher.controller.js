@@ -1,19 +1,15 @@
 const User = require('../models/users.models');
 const ClassSurvey = require('../models/classSurvey.model');
 const Class = require('../models/class.model');
+const response = require('../common/response');
+
 module.exports = {
     getTeachers: async (req, res) => {
         const teachers = await User.find({ role_id: 2 }, '_id name class email');
         if (teachers) {
-            res.send({
-                success: true,
-                data: teachers
-            })
+            response.success(res, teachers);
         } else {
-            res.send({
-                success: false,
-                message: "Users not found!"
-            })
+            response.false(res, "Users not found!");
         }
     },
     getClasses: async (req, res) => {
@@ -23,23 +19,14 @@ module.exports = {
             const teacher = await User.findById(_id);
             if (role_id === 1 || (role_id === 2 && userId === _id)) {
                 const classes = teacher.class;
-                res.send({
-                    success: true,
-                    data: classes
-                })
+                response.success(res, classes)
             }
             else {
-                res.send({
-                    success: false,
-                    message: "User not found!"
-                })
+                response.false(res, "User not found!");
             }
         }
         catch (err) {
-            res.send({
-                success: false,
-                message: "User can't access this!"
-            })
+            response.false(res, "User can't access this!");
         }
 
     },
@@ -53,18 +40,12 @@ module.exports = {
             if (isHaveClass) {
                 const classSurvey = await ClassSurvey.findById(classId);
                 console.log(classSurvey);
-                res.send({
-                    success: true,
-                    data: classSurvey
-                })
+                response.success(res, classSurvey);
             }
         }
         catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Class or user not found!"
-            })
+            response.false(res, "Class or user not found!");
         }
 
     },
@@ -80,30 +61,18 @@ module.exports = {
                 classes.push({
                     id: classId,
                     name: isExistClass.name
-                })
-                teacher.set({
-                    class: classes
-                })
-                teacher.save();
-                isExistClass.set({
-                    teacher: userId
                 });
+                teacher.set({ class: classes });
+                teacher.save();
+                isExistClass.set({ teacher: userId });
                 isExistClass.save();
-                res.send({
-                    success: true
-                })
+                response.success(res);
             } else {
-                res.send({
-                    success: false,
-                    message: 'Class hasnt existed!'
-                })
+                response.false(res, 'Class hasnt existed!');
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Err"
-            })
+            response.false(res, err);
         }
     },
     deleteClass: async (req, res) => {
@@ -119,23 +88,32 @@ module.exports = {
                         break;
                     }
                 }
-                teacher.set({
-                    class: classes
-                })
+                teacher.set({ class: classes });
                 teacher.save(err => {
-                    res.send({
-                        success: !err
-                    })
+                    res.send({ success: !err });
                 })
             } else {
-                res.send({
-                    success: false,
-                    message: "User still being a teacher of this class , please make orther teacher becomes before!"
-                })
+                response.false(res, "User still being a teacher of this class , please make orther teacher becomes before!");
             }
 
         } catch (err) {
             console.log(err);
+            response.false(res, err);
+        }
+    },
+    getStudentOfClass: async (req, res) => {
+        try {
+            const { userId, classId } = req.params;
+            const teacher = await User.findById(userId);
+            const teacherClasses = teacher.class;
+            const isHaveClass = teacherClasses.find(e => e.id === classId);
+            if (isHaveClass) {
+                const classTmp = await Class.findById(classId);
+                response.success(res, classTmp.students);
+            }
+        } catch (err) {
+            console.log(err);
+            response.false(res, err);
         }
     }
 }

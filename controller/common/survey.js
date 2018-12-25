@@ -1,6 +1,6 @@
-const StudentSurvey = require('../models/studentSurvey.model');
-const SurveyTemplate = require('../models/surveyTemplate.model');
-const Survey = require('../models/classSurvey.model');
+const StudentSurvey = require('../../models/studentSurvey.model');
+const SurveyTemplate = require('../../models/surveyTemplate.model');
+const Survey = require('../../models/classSurvey.model');
 
 const uuidv4 = require('uuid');
 const renderValue = (field) => {
