@@ -114,7 +114,19 @@ module.exports = {
             if (teacher) {
                 const classes = teacher.class;
                 if (classes.length !== 0) {
-                    response.false(res, "User still being teacher of some classes , please make other user becomes before");
+                    let isTeacher = false;
+                    for (let i = 0; i < classes.length; i++) {
+                        const classTmp = await Class.findById(classes[i].id)
+                        if (classTmp.teacher === userId) {
+                            isTeacher = true;
+                        }
+                    }
+                    if (isTeacher) {
+                        response.false(res, "User still being teacher of some classes , please make other user becomes before");
+                    } else {
+                        await User.findByIdAndDelete(userId);
+                        response.success(res);
+                    }
                 } else {
                     await User.findByIdAndDelete(userId);
                     response.success(res);
