@@ -85,6 +85,16 @@ module.exports = {
         newSurvey.save(err => err ? !err : err);
         return id;
     },
+    getTemplate: async () => {
+        try {
+            const templates = await SurveyTemplate.find({});
+            return !!templates ? templates : null;
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
+    ,
     assume: async (_class) => {
         const regex = new RegExp(_class);
         const studentSurveys = await StudentSurvey.find({ class: { $regex: regex } });

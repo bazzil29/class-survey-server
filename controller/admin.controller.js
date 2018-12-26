@@ -4,7 +4,8 @@ const surveyServices = require('./common/survey');
 const Class = require('../models/class.model');
 const User = require('../models/users.models');
 const Teacher = require('../models/teacher.model');
-const studentSurvey = require('../models/studentSurvey.model');
+const StudentSurvey = require('../models/studentSurvey.model');
+const ClassSurvey = require('../models/classSurvey.model');
 
 const fileHandler = require('../common/xlsxHandler');
 const response = require('../common/response');
@@ -91,7 +92,7 @@ module.exports = {
             const student = await User.findById(userId);
             if (student) {
                 student.class.forEach(async e => {
-                    await studentSurvey.findByIdAndDelete(e.survey_student);
+                    await StudentSurvey.findByIdAndDelete(e.survey_student);
                 })
                 if (await userSevices.delete(userId)) {
                     response.success(res);
@@ -104,6 +105,7 @@ module.exports = {
             response.false(res, err);
         }
     },
+
     deleteTeacher: async (req, res) => {
         try {
             const { userId } = req.params;
@@ -121,6 +123,7 @@ module.exports = {
             response.false(res, err);
         }
     },
+
     getTeachers: async (req, res) => {
         try {
             const teachers = await Teacher.find({ role_id: 2 }, '_id name class email');
@@ -138,6 +141,12 @@ module.exports = {
         try {
             const classes = await Class.find({});
             if (classes) {
+                for (let i = 0; i < classes.length; i++) {
+                    const classSurvey = await ClassSurvey.findById(classes[i]._id);
+                    classes[i].create_at = classSurvey.create_at;
+                    classes[i].last_modify = classSurvey.last_modify;
+                    classes[i].deadline = classSurvey.deadline;
+                }
                 response.success(res, classes)
             } else {
                 response.false(res, "Error!");
@@ -151,7 +160,6 @@ module.exports = {
 
     addClass: async (req, res) => {
         try {
-
             const { id, teacher, name, students, place, count_credit } = fileHandler.classFile(req.files[0].path);
             // fs.unlink(req.files[0].path);
             const isExistClass = await Class.findById(id);
@@ -190,36 +198,30 @@ module.exports = {
         const teachers = fileHandler.teacherFile(req.files[0].path);
         // fs.unlink(req.files[0].path);
         if (teachers) {
-            teachers.forEach(e => {
-                userSevices.createTeacher(e)
-            });
-            res.send({
-                success: true
-            })
+            teachers.forEach(e => { userSevices.createTeacher(e) });
+            response.success(res);
         } else {
-            res.send({
-                success: false,
-                message: "no file"
-            })
+            response.false(res, "NO file!");
         }
     },
 
     addFileStudent: async (req, res) => {
         const students = fileHandler.studentFile(req.files[0].path);
         // fs.unlink(req.files[0].path);
-
         if (students) {
-            students.forEach(e => {
-                userSevices.createStudent(e)
-            });
-            res.send({
-                success: true
-            })
+            students.forEach(e => { userSevices.createStudent(e) });
+            response.success(res);
         } else {
-            res.send({
-                success: false,
-                message: "No file"
-            })
+            response.false(res, "No file");
         }
     },
+
+    getSurveyTemplate: async (res, req) => {
+        const templates = await surveyServices.getTemplate();
+        if (templates) {
+            response.success(res, templates);
+        } else {
+            response.false(res, "Error!");
+        }
+    }
 }
