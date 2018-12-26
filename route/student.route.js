@@ -11,7 +11,7 @@ router.get('', tokenChecker.student, student.getStudents);
 //classes of student
 router.get('/:userId/classes', tokenChecker.student, identify.verify, student.getClasses);
 router.post('/:userId/classes', tokenChecker.student, identify.verify, student.addClass);
-router.delete('/:userId/classes', tokenChecker.student, identify.verify, student.deleteClass);
+router.delete('/:userId/classes/:classId', tokenChecker.student, identify.verify, student.deleteClass);
 
 //survey of class 
 router.get('/:userId/classes/:classId/survey', tokenChecker.student, identify.verify, student.getSurvey);

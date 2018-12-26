@@ -9,7 +9,7 @@ module.exports = {
     },
 
     false: (res, message) => {
-        return res.status(401).send({
+        return res.status(200).send({
             success: false,
             message: message
         })

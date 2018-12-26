@@ -3,6 +3,7 @@ const SurveyTemplate = require('../../models/surveyTemplate.model');
 const Survey = require('../../models/classSurvey.model');
 
 const uuidv4 = require('uuid');
+
 const renderValue = (field) => {
     if (field.fields) {
         const tmp = field.fields.map(element => {
@@ -31,13 +32,23 @@ const renderValue = (field) => {
 module.exports = {
     createStudentSurvey: async (type = 1, _classId) => {
         let groupFields = [];
-        try {
-            const template = await SurveyTemplate.findById(type);
-            groupFields = template ? template.group_fields : []
+        const templates = await SurveyTemplate.find({});
+        if (templates) {
+            templates.forEach(e => {
+                if (e.isUse) {
+                    groupFields = e.group_fields
+                }
+            })
+        } else {
+            return false;
         }
-        catch (err) {
-            console.log(err);
-        }
+        // try {
+        //     const template = await SurveyTemplate.findById(type);
+        //     groupFields = template ? template.group_fields : []
+        // }
+        // catch (err) {
+        //     console.log(err);
+        // }
         const date = new Date();
         const uuid = uuidv4();
         const newStudentSurvey = new StudentSurvey({
@@ -50,25 +61,37 @@ module.exports = {
         let result = null;
         newStudentSurvey.save(err => err ? !err : err);
         return uuid;
-
     },
 
     deleteStudentSurvey: async (id) => {
         const result = await StudentSurvey.findByIdAndDelete(id);
         return true;
-    }
-    ,
+    },
 
     createSurvey: async (type = 1, id) => {
 
         let groupFields = [];
-        try {
-            const template = await SurveyTemplate.findById(type);
-            groupFields = template ? template.group_fields : []
+
+        const templates = await SurveyTemplate.find({});
+        if (templates) {
+            templates.forEach(e => {
+                if (e.isUse) {
+                    groupFields = e.group_fields
+                }
+            })
+        } else {
+            return false;
         }
-        catch (err) {
-            console.log(err);
-        }
+
+        // try {
+        //     const template = await SurveyTemplate.findById(type);
+        //     groupFields = template ? template.group_fields : []
+        // }
+
+        // catch (err) {
+        //     console.log(err);
+        // }
+
         const d = new Date();
         const date = d.getTime();
         const deadline = d.setTime(d.getTime() + 60 * 60 * 1000 * 24 * 15);
@@ -85,16 +108,92 @@ module.exports = {
         newSurvey.save(err => err ? !err : err);
         return id;
     },
-    getTemplate: async () => {
+
+    resetSurvey: async () => {
+        let groupFields = [];
+        const templates = await SurveyTemplate.find({});
+        if (templates) {
+            templates.forEach(e => {
+                if (e.isUse) {
+                    groupFields = e.group_fields
+                }
+            })
+        } else {
+            return false;
+        }
+
+        const surveys = await Survey.find({});
+
+        if (surveys) {
+            surveys.forEach(e => {
+                const d = new Date();
+                const date = d.getTime();
+                const deadline = d.setTime(d.getTime() + 60 * 60 * 1000 * 24 * 15);
+                e.set({
+                    create_at: date,
+                    last_modify: date,
+                    deadline: deadline,
+                    group_fields: groupFields.map(e => renderValue(e)),
+                    survey_template: "1"
+                });
+                e.save();
+                return true;
+            })
+        } else {
+            return false;
+        }
+
+    },
+
+    resetStudentSurvey: async () => {
+        let groupFields = [];
+        const templates = await SurveyTemplate.find({});
+        if (templates) {
+            templates.forEach(e => {
+                if (e.isUse) {
+                    groupFields = e.group_fields
+                }
+            })
+        } else {
+            return false;
+        }
+        const studentSurveys = await StudentSurvey.find({});
+        if (studentSurveys) {
+            studentSurveys.forEach(e => {
+                const date = new Date();
+                e.set({
+                    create_at: date.getTime(),
+                    modify_at: date.getTime(),
+                    group_fields: groupFields
+                });
+                e.save();
+                return true;
+            })
+        } else {
+            return false;
+        }
+    },
+
+    getTemplates: async () => {
         try {
-            const templates = await SurveyTemplate.find({});
+            const templates = await SurveyTemplate.find({}, "_id name create_at modify_at isUse");
             return !!templates ? templates : null;
         } catch (err) {
             console.log(err);
             return null;
         }
-    }
-    ,
+    },
+
+    getTemplate: async (id) => {
+        try {
+            const templates = await SurveyTemplate.findById(id);
+            return !!templates ? templates : null;
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    },
+
     assume: async (_class) => {
         const regex = new RegExp(_class);
         const studentSurveys = await StudentSurvey.find({ class: { $regex: regex } });

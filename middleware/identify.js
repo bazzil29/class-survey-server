@@ -1,3 +1,4 @@
+const response = require("../common/response");
 module.exports = {
     verify: (req, res, next) => {
         const { userId } = req.params;
@@ -6,10 +7,7 @@ module.exports = {
             next();
         }
         else {
-            res.send({
-                success: false,
-                message: "User can't access this!"
-            })
+            response.false(res, "User can't access this!");
         }
     }
 }

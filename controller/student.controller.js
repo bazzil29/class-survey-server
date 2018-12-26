@@ -4,19 +4,14 @@ const Survey = require('../models/classSurvey.model');
 const surveyChecker = require('../common/validateSurvey');
 const Class = require('../models/class.model');
 const surveyServices = require('./common/survey');
+const response = require("../common/response");
 module.exports = {
     getStudents: async (req, res) => {
         const students = await User.find({ role_id: 3 }, '_id name class base_class date_of_birth');
         if (students) {
-            res.send({
-                success: true,
-                data: students
-            })
+            response.success(res, students);
         } else {
-            res.send({
-                success: false,
-                message: "Users not found!"
-            })
+            response.false(res, "Users not found!");
         }
     },
     getClasses: async (req, res) => {
@@ -24,17 +19,10 @@ module.exports = {
         const student = await User.findById(userId);
         if (student) {
             const classes = student.class;
-            res.send({
-                success: true,
-                data: classes
-            })
+            response.success(res, classes);
         } else {
-            res.send({
-                success: false,
-                message: "Student not found!"
-            })
+            response.false(res, "Student not found!");
         }
-
     },
 
     getSurvey: async (req, res) => {
@@ -42,34 +30,20 @@ module.exports = {
         const student = await User.findById(userId);
         try {
             if (student) {
-                const isExistClass = student.class.find(e => {
-                    return e.id === classId;
-                });
+                const isExistClass = student.class.find(e => e.id === classId);
                 const survey = await StudentSurvey.findById(isExistClass.survey_student);
                 if (survey) {
-                    res.send({
-                        success: true,
-                        data: { survey: survey }
-                    })
+                    response.success(res, { survey: survey })
                 }
                 else {
-                    res.send({
-                        success: false,
-                        message: "Class is not exist!"
-                    })
+                    response.false(res, "Class is not exist!");
                 }
             } else {
-                res.send({
-                    success: false,
-                    message: "User not found! "
-                })
+                response.false(res, "User not found!");
             }
         }
         catch (err) {
-            res.send({
-                success: false,
-                message: "Err!"
-            })
+            response.success(res, err);
         }
     },
 
@@ -79,9 +53,7 @@ module.exports = {
             const { survey: surveyReq } = req.body;
             const classSameType = classId.split(' ')[0];
             const student = await User.findById(userId);
-            const classTmp = student.class.find(e => {
-                return e.id === classId;
-            });
+            const classTmp = student.class.find(e => e.id === classId);
             const surveyStudent = await StudentSurvey.findById(classTmp.survey_student);
             const classSurvey = await Survey.findById(classId);
             const d = new Date();
@@ -120,7 +92,7 @@ module.exports = {
                     classSurvey.set({ group_fields: group_fields })
                     await classSurvey.save();
                     // console.log(classSurvey.group_fields[0].fields[0])
-                    res.send({ success: true })
+                    response.success(res);
                 })
 
 
@@ -128,10 +100,7 @@ module.exports = {
 
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Err"
-            })
+            response.false(res, err);
         }
 
 
@@ -143,15 +112,10 @@ module.exports = {
             const student = await User.findById(userId);
             if (student) {
                 const classes = student.class;
-                const isExist = classes.find((e) => {
-                    return e.id === classId;
-                });
+                const isExist = classes.find((e) => e.id === classId);
 
                 if (isExist) {
-                    res.send({
-                        success: false,
-                        message: "Class had existed!"
-                    })
+                    response.false(res, "Class had existed!");
                 }
                 const classTmp = await Class.findById(classId);
                 const survey = await Survey.findById(classId);
@@ -168,18 +132,12 @@ module.exports = {
                         res.send({ success: !err })
                     });
                 } else {
-                    res.send({
-                        success: false,
-                        message: "Class not found!"
-                    })
+                    response.false(res, "Class not found!");
                 }
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Err!"
-            })
+            response.false(res, err);
         }
     },
 
@@ -190,37 +148,22 @@ module.exports = {
             const student = await User.findById(userId);
             if (student) {
                 const classes = student.class;
-                const isExist = classes.find((e) => {
-                    return e.id === classId;
-                });
+                const isExist = classes.find((e) => e.id === classId);
 
                 if (isExist) {
                     classes.splice(classes.indexOf(isExist), 1);
-                    student.set({
-                        class: classes
-                    })
+                    student.set({ class: classes })
                     student.save();
-                    res.send({
-                        success: !!surveyServices.deleteStudentSurvey(isExist.survey_student)
-                    })
+                    res.send({ success: !!surveyServices.deleteStudentSurvey(isExist.survey_student) })
                 } else {
-                    res.send({
-                        success: false,
-                        message: "Class hadn't existed"
-                    })
+                    response.false(res, "Class hadn't existed");
                 }
             } else {
-                res.send({
-                    success: false,
-                    message: "Student not found!"
-                })
+                response.false(res, "Student not found!");
             }
         } catch (err) {
             console.log(err);
-            res.send({
-                success: false,
-                message: "Err!"
-            })
+            response.false(res, err);
         }
     }
 }

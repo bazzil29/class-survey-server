@@ -108,8 +108,20 @@ module.exports = {
             const teacherClasses = teacher.class;
             const isHaveClass = teacherClasses.find(e => e.id === classId);
             if (isHaveClass) {
-                const classTmp = await Class.findById(classId);
-                response.success(res, classTmp.students);
+                const users = await User.find({ role_id: 3 }, "_id name class date_of_birth base_class email");
+                const students = [];
+                users.forEach(e => {
+                    let isTrue = false;
+                    e.class.forEach(element => {
+                        if (element.id === classId) {
+                            isTrue = true;
+                        }
+                    });
+                    if (isTrue) {
+                        students.push(e);
+                    }
+                })
+                response.success(res, students);
             }
         } catch (err) {
             console.log(err);

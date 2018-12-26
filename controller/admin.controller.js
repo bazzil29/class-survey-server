@@ -6,12 +6,13 @@ const User = require('../models/users.models');
 const Teacher = require('../models/teacher.model');
 const StudentSurvey = require('../models/studentSurvey.model');
 const ClassSurvey = require('../models/classSurvey.model');
-
+const SurveyTemplate = require('../models/surveyTemplate.model');
 const fileHandler = require('../common/xlsxHandler');
 const response = require('../common/response');
 
 
-const fs = require('fs');
+const uuidv4 = require('uuid');
+
 
 module.exports = {
 
@@ -57,7 +58,7 @@ module.exports = {
     addStudent: async (req, res) => {
 
         const data = req.body.data;
-        if (userSevices.createStudent(data)) {
+        if (await userSevices.createStudent(data)) {
             response.success(res);
         } else {
             response.false(res, "Error!");
@@ -65,9 +66,9 @@ module.exports = {
 
     },
 
-    addTeacher: async () => {
+    addTeacher: async (req, res) => {
         const data = req.body.data;
-        if (userSevices.createTeacher(data)) {
+        if (await userSevices.createTeacher(data)) {
             response.success(res);
         } else {
             response.false(res, "err");
@@ -113,8 +114,9 @@ module.exports = {
             if (teacher) {
                 const classes = teacher.class;
                 if (classes.length !== 0) {
-                    response.false(res, "User still being teacher of some classes , please make other user becoems before");
+                    response.false(res, "User still being teacher of some classes , please make other user becomes before");
                 } else {
+                    await User.findByIdAndDelete(userId);
                     response.success(res);
                 }
             }
@@ -139,20 +141,28 @@ module.exports = {
 
     getClasses: async (req, res) => {
         try {
-            const classes = await Class.find({});
+            const classes = await Class.find({}, "_id name place survey_id teacher");
             if (classes) {
+                let classesTmp = [];
                 for (let i = 0; i < classes.length; i++) {
                     const classSurvey = await ClassSurvey.findById(classes[i]._id);
-                    classes[i].create_at = classSurvey.create_at;
-                    classes[i].last_modify = classSurvey.last_modify;
-                    classes[i].deadline = classSurvey.deadline;
+                    classesTmp[i] = {
+                        create_at: classSurvey.create_at,
+                        last_modify: classSurvey.last_modify,
+                        deadline: classSurvey.deadline,
+                        _id: classes[i]._id,
+                        name: classes[i].name,
+                        place: classes[i].place,
+                        survey_id: classes[i].survey_id
+                    };
                 }
-                response.success(res, classes)
+                response.success(res, classesTmp)
             } else {
                 response.false(res, "Error!");
             }
         }
         catch (err) {
+            console.log(err);
             response.false(res, err);
         }
 
@@ -216,12 +226,139 @@ module.exports = {
         }
     },
 
-    getSurveyTemplate: async (res, req) => {
-        const templates = await surveyServices.getTemplate();
+    getSurveyTemplates: async (req, res) => {
+        const templates = await surveyServices.getTemplates();
         if (templates) {
             response.success(res, templates);
         } else {
             response.false(res, "Error!");
+        }
+    },
+
+    addTemplate: async (req, res) => {
+        try {
+            const { create_at, name, modify_at, group_fields } = req.body;
+            const uuid = uuidv4();
+            const newTemplate = new SurveyTemplate({ _id: uuid, create_at, name, modify_at, group_fields, isUse: false });
+            await newTemplate.save();
+            response.success(res);
+        } catch (err) {
+            console.log(err);
+            response.false(res, err);
+        }
+    },
+
+    updateTemplate: async (req, res) => {
+        try {
+            const { templateId } = req.params;
+            const { name, modify_at, group_fields } = req.body;
+            const template = await SurveyTemplate.findById(templateId);
+            if (!template.isUse) {
+                template.set({ name, modify_at, group_fields });
+                template.save();
+                response.success(res);
+            } else {
+                await template.set({ name, modify_at, group_fields });
+                await template.save();
+                surveyServices.resetSurvey();
+                surveyServices.resetStudentSurvey();
+                response.success(res);
+            }
+        } catch (err) {
+            console.log(err);
+            response.false(res, "Template is not existed!");
+        }
+    },
+
+    makeUseTemplate: async (req, res) => {
+        const { templateId } = req.params;
+        const templates = await SurveyTemplate.find({});
+
+        if (templates) {
+            for (let i = 0; i < templates.length; i++) {
+                if (templates[i].isUse) {
+                    templates[i].set({
+                        isUse: false
+                    });
+                    templates[i].save();
+                    break;
+                }
+            }
+        }
+
+        const template = await SurveyTemplate.findById(templateId);
+        if (!template.isUse) {
+            await template.set({ isUse: true });
+            await template.save();
+            surveyServices.resetSurvey();
+            surveyServices.resetStudentSurvey();
+            response.success(res);
+        } else {
+            response.false(res, "This template is current template!")
+        }
+    },
+
+    getSurveyTemplate: async (req, res) => {
+        const { templateId } = req.params;
+        const templates = await surveyServices.getTemplate(templateId);
+        if (templates) {
+            response.success(res, templates);
+        } else {
+            response.false(res, "Error!");
+        }
+    },
+
+
+
+    getSurvey: async (req, res) => {
+        try {
+            const { classId } = req.params;
+            const classSurvey = await ClassSurvey.findById(classId);
+            response.success(res, classSurvey)
+        }
+        catch (err) {
+            console.log(err);
+            response.false(res, "Error!");
+        }
+    },
+
+    reset: async (req, res) => {
+        try {
+            const users = await User.find({});
+            if (users) {
+                users.forEach(async e => {
+                    if (e._id !== "admin") {
+                        await User.findByIdAndDelete(e._id);
+                    }
+                })
+            } else {
+                response.false(res);
+            }
+
+            const classes = await Class.find({});
+            if (classes) {
+                classes.forEach(async e => await Class.findByIdAndDelete(e._id));
+            } else {
+                response.false(res);
+            }
+
+            const classSurveys = await ClassSurvey.find({});
+            if (classSurveys) {
+                classSurveys.forEach(async e => await ClassSurvey.findByIdAndDelete(e._id));
+            } else {
+                response.false(res);
+            }
+
+            const studentsSurvers = await StudentSurvey.find({});
+            if (studentsSurvers) {
+                studentsSurvers.forEach(async e => await StudentSurvey.findByIdAndDelete(e._id));
+            } else {
+                response.false(res);
+            }
+
+            response.success(res);
+        } catch (err) {
+            console.log(err);
         }
     }
 }

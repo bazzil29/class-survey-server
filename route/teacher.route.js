@@ -13,7 +13,7 @@ router.get('', tokenChecker.teacher, teacher.getTeachers);
 //classes of teacher
 router.get('/:userId/classes', tokenChecker.teacher, identify.verify, teacher.getClasses);
 router.post('/:userId/classes', tokenChecker.teacher, identify.verify, teacher.addClass);
-router.delete('/:userId/classes', tokenChecker.teacher, identify.verify, teacher.deleteClass);
+router.delete('/:userId/classes/:classId', tokenChecker.teacher, identify.verify, teacher.deleteClass);
 //student of each class
 router.get('/:userId/classes/:classId/students', tokenChecker.teacher, identify.verify, teacher.getStudentOfClass);
 //survey of each class

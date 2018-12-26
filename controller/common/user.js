@@ -5,7 +5,7 @@ const surveyServices = require('./survey');
 
 module.exports = {
     createTeacher: async (data, _classes = []) => {
-        const { id, name, email, password } = data;
+        const { id, name, email, password, date_of_birth } = data;
         try {
             const isExistUser = await User.findById(id);
             if (!isExistUser) {
@@ -16,10 +16,12 @@ module.exports = {
                     role_id: 2,
                     password: hashPassword,
                     class: _classes,
-                    email: email
+                    email: email,
+                    date_of_birth: date_of_birth
                 });
 
-                return newUser.save(err => !err);
+                newUser.save();
+                return true;
 
             }
             else {
@@ -28,7 +30,8 @@ module.exports = {
                 isExistUser.set({
                     class: classes
                 });
-                return isExistUser.save(err => !err)
+                isExistUser.save();
+                return true;
             }
         }
         catch (err) {
@@ -62,7 +65,8 @@ module.exports = {
                     date_of_birth: date_of_birth,
                     email: email
                 });
-                return newUser.save(err => !err);
+                newUser.save();
+                return true;
             }
             else {
                 const classes = isExistUser.class.slice();
@@ -77,7 +81,8 @@ module.exports = {
                 isExistUser.set({
                     class: classes
                 });
-                return isExistUser.save(err => err)
+                isExistUser.save();
+                return true;
             }
         }
         catch (err) {

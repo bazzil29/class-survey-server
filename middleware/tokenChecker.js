@@ -1,5 +1,6 @@
 const jwt = require('../common/jwt');
 const User = require('../models/users.models');
+const response = require("../common/response");
 
 module.exports = {
     admin: async (req, res, next) => {
@@ -13,23 +14,14 @@ module.exports = {
                     req.body._id = value._id;
                     next();
                 } else {
-                    res.send({
-                        success: false,
-                        message: "User can't access!"
-                    })
+                    response.false(res, "User can't access!");
                 }
             } catch (err) {
-                res.status(401).send({
-                    success: false,
-                    message: "Invalid token or expried!"
-                })
+                response.false(res, "Invalid token or expried!");
             }
         }
         else {
-            res.send({
-                success: false,
-                message: "Please send a token!"
-            })
+            response.false(res, "Please send a token!");
         }
     },
     teacher: async (req, res, next) => {
@@ -38,28 +30,19 @@ module.exports = {
         if (access_token) {
             try {
                 const value = jwt.verify(access_token).body.value;
-                if (value.role_id === 2) {
+                if (value.role_id !== 3) {
                     req.body.role_id = value.role_id;
                     req.body._id = value._id;
                     next();
                 } else {
-                    res.send({
-                        success: false,
-                        message: "User can't access!"
-                    })
+                    response.false(res, "User can't access!");
                 }
             } catch (err) {
-                res.status(401).send({
-                    success: false,
-                    message: "Invalid token or expried!"
-                })
+                response.false(res, "Invalid token or expried!");
             }
         }
         else {
-            res.send({
-                success: false,
-                message: "Please send a token!"
-            })
+            response.false(res, "Please send a token!");
         }
     },
     student: async (req, res, next) => {
@@ -67,28 +50,19 @@ module.exports = {
         if (access_token) {
             try {
                 const value = jwt.verify(access_token).body.value;
-                if (value.role_id === 3) {
+                if (value.role_id !== 2) {
                     req.body.role_id = value.role_id;
                     req.body._id = value._id;
                     next();
                 } else {
-                    res.send({
-                        success: false,
-                        message: "User can't access!"
-                    })
+                    response.false(res, "User can't access!");
                 }
             } catch (err) {
-                res.status(401).send({
-                    success: false,
-                    message: "Invalid token or expried!"
-                })
+                response.false(res, "Invalid token or expried!");
             }
         }
         else {
-            res.send({
-                success: false,
-                message: "Please send a token!"
-            })
+            response.false(res, "Please send a token!");
         }
     },
     user: async (req, res, next) => {
@@ -101,17 +75,11 @@ module.exports = {
                 req.body._id = value._id;
                 next();
             } catch (err) {
-                res.status(401).send({
-                    success: false,
-                    message: "Invalid token or expried!"
-                })
+                response.false(res, "Invalid token or expried!");
             }
         }
         else {
-            res.send({
-                success: false,
-                message: "Please send a token!"
-            })
+            response.false(res, "Please send a token!");
         }
     },
 }
