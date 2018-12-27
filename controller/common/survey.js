@@ -2,6 +2,7 @@ const StudentSurvey = require('../../models/studentSurvey.model');
 const SurveyTemplate = require('../../models/surveyTemplate.model');
 const Survey = require('../../models/classSurvey.model');
 
+const surveyChecker = require('../../common/validateSurvey');
 const uuidv4 = require('uuid');
 
 const renderValue = (field) => {
@@ -201,23 +202,37 @@ module.exports = {
         const studentSurveys = await StudentSurvey.find({ class: { $regex: regex } });
         const result = [];
 
+        let count = 0;
+
+        studentSurveys.forEach(e => {
+            if (surveyChecker.verify(e)) {
+                count++;
+            }
+        })
+
+        count = count === 0 ? 1 : count;
+
+
         for (let j = 0; j < studentSurveys[0].group_fields.length; j++) {
             result[j] = [];
             for (let k = 0; k < studentSurveys[0].group_fields[j].fields.length; k++) {
                 result[j][k] = {
                     total: 0,
                     total_s: 0,
-                    count: studentSurveys.length,
+                    count: count,
                     M: 0,
-                    STD: 0
+                    STD: 0,
+                    count_x: studentSurveys.length
                 }
             }
         }
 
         for (let i = 0; i < studentSurveys.length; i++) {
-            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
-                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
-                    result[j][k].total += studentSurveys[i].group_fields[j].fields[k].value;
+            if (surveyChecker.verify(studentSurveys[i])) {
+                for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                    for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                        result[j][k].total += studentSurveys[i].group_fields[j].fields[k].value;
+                    }
                 }
             }
         }
@@ -233,13 +248,15 @@ module.exports = {
 
 
         for (let i = 0; i < studentSurveys.length; i++) {
-            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
-                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
-                    if (studentSurveys[i].group_fields[j].fields[k].value >= result[j][k].M) {
-                        result[j][k].total_s += Math.pow(Math.abs(studentSurveys[i].group_fields[j].fields[k].value - result[j][k].M), 2);
+            if (surveyChecker.verify(studentSurveys[i])) {
+                for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                    for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                        if (studentSurveys[i].group_fields[j].fields[k].value >= result[j][k].M) {
+                            result[j][k].total_s += Math.pow(Math.abs(studentSurveys[i].group_fields[j].fields[k].value - result[j][k].M), 2);
 
-                    } else {
-                        result[j][k].total_s += Math.pow(result[j][k].M - studentSurveys[i].group_fields[j].fields[k].value, 2);
+                        } else {
+                            result[j][k].total_s += Math.pow(result[j][k].M - studentSurveys[i].group_fields[j].fields[k].value, 2);
+                        }
                     }
                 }
             }
@@ -263,24 +280,35 @@ module.exports = {
             studentSurveys.push(...studentSurveysTmp);
         }
         const result = [];
-        console.log(studentSurveys);
+        let count = 0;
+
+        studentSurveys.forEach(e => {
+            if (surveyChecker.verify(e)) {
+                count++;
+            }
+        })
+
+        count = count === 0 ? 1 : count;
+
         for (let j = 0; j < studentSurveys[0].group_fields.length; j++) {
             result[j] = [];
             for (let k = 0; k < studentSurveys[0].group_fields[j].fields.length; k++) {
                 result[j][k] = {
                     total: 0,
                     total_s: 0,
-                    count: studentSurveys.length,
+                    count: count,
                     M: 0,
-                    STD: 0
+                    STD: 0,
                 }
             }
         }
 
         for (let i = 0; i < studentSurveys.length; i++) {
-            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
-                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
-                    result[j][k].total += studentSurveys[i].group_fields[j].fields[k].value;
+            if (surveyChecker.verify(studentSurveys[i])) {
+                for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                    for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                        result[j][k].total += studentSurveys[i].group_fields[j].fields[k].value;
+                    }
                 }
             }
         }
@@ -296,13 +324,15 @@ module.exports = {
 
 
         for (let i = 0; i < studentSurveys.length; i++) {
-            for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
-                for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
-                    if (studentSurveys[i].group_fields[j].fields[k].value >= result[j][k].M) {
-                        result[j][k].total_s += Math.pow(Math.abs(studentSurveys[i].group_fields[j].fields[k].value - result[j][k].M), 2);
+            if (surveyChecker.verify(studentSurveys[i])) {
+                for (let j = 0; j < studentSurveys[i].group_fields.length; j++) {
+                    for (let k = 0; k < studentSurveys[i].group_fields[j].fields.length; k++) {
+                        if (studentSurveys[i].group_fields[j].fields[k].value >= result[j][k].M) {
+                            result[j][k].total_s += Math.pow(Math.abs(studentSurveys[i].group_fields[j].fields[k].value - result[j][k].M), 2);
 
-                    } else {
-                        result[j][k].total_s += Math.pow(result[j][k].M - studentSurveys[i].group_fields[j].fields[k].value, 2);
+                        } else {
+                            result[j][k].total_s += Math.pow(result[j][k].M - studentSurveys[i].group_fields[j].fields[k].value, 2);
+                        }
                     }
                 }
             }

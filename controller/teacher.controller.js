@@ -1,6 +1,8 @@
 const User = require('../models/users.models');
 const ClassSurvey = require('../models/classSurvey.model');
 const Class = require('../models/class.model');
+const StudentSurvey = require('../models/studentSurvey.model');
+
 const response = require('../common/response');
 
 module.exports = {
@@ -37,10 +39,31 @@ module.exports = {
             const teacher = await User.findById(userId);
             const teacherClasses = teacher.class;
             const isHaveClass = teacherClasses.find(e => e.id === classId);
+            const studentSurveys = await StudentSurvey.find({ class: classId });
+            const comments = [];
+
+            if (studentSurveys) {
+                studentSurveys.forEach(e => {
+                    if (!!e.comment) {
+                        comments.push(e.comment);
+                    }
+                })
+            }
+
             if (isHaveClass) {
                 const classSurvey = await ClassSurvey.findById(classId);
                 console.log(classSurvey);
-                response.success(res, classSurvey);
+                const classSurveyTmp = {
+                    _id: classSurvey._id,
+                    group_fields: classSurvey.group_fields,
+                    class: classSurvey.class,
+                    create_at: classSurvey.create_at,
+                    last_modify: classSurvey.last_modify,
+                    deadline: classSurvey.deadline,
+                    comments: comments,
+                    count_of_students: studentSurveys.length
+                }
+                response.success(res, classSurveyTmp);
             }
         }
         catch (err) {

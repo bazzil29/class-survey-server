@@ -50,7 +50,7 @@ module.exports = {
     updateSurvey: async (req, res) => {
         try {
             const { userId, classId } = req.params;
-            const { survey: surveyReq } = req.body;
+            const { survey: surveyReq, comment } = req.body;
             const classSameType = classId.split(' ')[0];
             const student = await User.findById(userId);
             const classTmp = student.class.find(e => e.id === classId);
@@ -59,11 +59,11 @@ module.exports = {
             const d = new Date();
             surveyStudent.set({
                 group_fields: surveyReq,
-                modify_at: d.getTime()
+                modify_at: d.getTime(),
+                comment: comment
             })
 
             if (surveyChecker.verify(surveyStudent)) {
-
                 surveyStudent.save(async err => {
                     const class_temp = await Class.findById(classId);
                     const teacher = await User.findById(class_temp.teacher);
@@ -94,8 +94,6 @@ module.exports = {
                     // console.log(classSurvey.group_fields[0].fields[0])
                     response.success(res);
                 })
-
-
             }
 
         } catch (err) {

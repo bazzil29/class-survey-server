@@ -7,8 +7,11 @@ const Teacher = require('../models/teacher.model');
 const StudentSurvey = require('../models/studentSurvey.model');
 const ClassSurvey = require('../models/classSurvey.model');
 const SurveyTemplate = require('../models/surveyTemplate.model');
+
 const fileHandler = require('../common/xlsxHandler');
 const response = require('../common/response');
+const surveyChecker = require('../common/validateSurvey');
+
 
 
 const uuidv4 = require('uuid');
@@ -344,13 +347,35 @@ module.exports = {
             const { classId } = req.params;
             const classTmp = await Class.findById(classId);
             const classSurvey = await ClassSurvey.findById(classId);
+            const studentSurveys = await StudentSurvey.find({ class: classId });
+            const comments = [];
+
+            let count = 0;
+
+            studentSurveys.forEach(e => {
+                if (surveyChecker.verify(e)) {
+                    count++;
+                }
+            })
+
+
+            if (studentSurveys) {
+                studentSurveys.forEach(e => {
+                    if (!!e.comment) {
+                        comments.push(e.comment);
+                    }
+                })
+            }
+
             const classSurveyTmp = {
                 name: classTmp.name,
                 group_fields: classSurvey.group_fields,
                 last_modify: classSurvey.last_modify,
                 deadline: classSurvey.deadline,
                 create_at: classSurvey.create_at,
-                _id: classSurvey._id
+                _id: classSurvey._id,
+                comments: comments,
+                count_of_students: count
             };
             response.success(res, classSurveyTmp)
         }
@@ -366,6 +391,12 @@ module.exports = {
         await ClassSurvey.findByIdAndDelete(classId);
         const students = await User.find({ role_id: 3 });
         const teachers = await User.find({ role_id: 2 });
+        for (let i = 0; i < students.length; i++) {
+            for (let j = 0; i < students[i].class.length; j++) {
+                await StudentSurvey.findByIdAndDelete(students[i].class[j].survey_student);
+            }
+        }
+
         students.forEach(e => {
             for (let i = 0; i < e.class.length; i++) {
                 if (e.class[i].id === classId) {
