@@ -33,6 +33,8 @@ router.delete('/teachers/:userId', token.admin, admin.deleteTeacher);
 
 router.get('/classes', token.admin, admin.getClasses);
 router.get('/classes/:classId/survey', token.admin, admin.getSurvey);
+router.put('/classes/:classId/survey', token.admin, admin.updateSurvey);
+router.delete('/classes/:classId/survey', token.admin, admin.deleteSurvey);
 router.post('/classes/file', token.admin, upload.any(), admin.addClass);
 
 

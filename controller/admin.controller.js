@@ -320,18 +320,71 @@ module.exports = {
         }
     },
 
+    updateSurvey: async (req, res) => {
+        const { classId } = req.params;
+        const { name, last_modify, deadline } = req.body;
 
+        const classTmp = await Class.findById(classId);
+
+        const classSurvey = await ClassSurvey.findById(classId);
+
+        if (classTmp && classSurvey) {
+            classTmp.set({ name });
+            classSurvey.set({ last_modify, deadline });
+            classTmp.save();
+            classSurvey.save();
+            response.success(res);
+        } else {
+            response.false(res, "Error!");
+        }
+    },
 
     getSurvey: async (req, res) => {
         try {
             const { classId } = req.params;
+            const classTmp = await Class.findById(classId);
             const classSurvey = await ClassSurvey.findById(classId);
-            response.success(res, classSurvey)
+            const classSurveyTmp = {
+                name: classTmp.name,
+                group_fields: classSurvey.group_fields,
+                last_modify: classSurvey.last_modify,
+                deadline: classSurvey.deadline,
+                create_at: classSurvey.create_at,
+                _id: classSurvey._id
+            };
+            response.success(res, classSurveyTmp)
         }
         catch (err) {
             console.log(err);
             response.false(res, "Error!");
         }
+    },
+
+    deleteSurvey: async (req, res) => {
+        const { classId } = req.params;
+        await Class.findByIdAndDelete(classId);
+        await ClassSurvey.findByIdAndDelete(classId);
+        const students = await User.find({ role_id: 3 });
+        const teachers = await User.find({ role_id: 2 });
+        students.forEach(e => {
+            for (let i = 0; i < e.class.length; i++) {
+                if (e.class[i].id === classId) {
+                    e.class.splice(i, 1);
+                    break;
+                }
+            }
+            e.save();
+        })
+        teachers.forEach(e => {
+            for (let i = 0; i < e.class.length; i++) {
+                if (e.class[i].id === classId) {
+                    e.class.splice(i, 1);
+                    break;
+                }
+            }
+            e.save();
+        });
+        response.success(res);
     },
 
     reset: async (req, res) => {

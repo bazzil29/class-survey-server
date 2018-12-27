@@ -56,7 +56,8 @@ module.exports = {
             class: _classId,
             create_at: date.getTime(),
             modify_at: date.getTime(),
-            group_fields: groupFields
+            group_fields: groupFields,
+            comment: null
         });
         let result = null;
         newStudentSurvey.save(err => err ? !err : err);
@@ -164,7 +165,8 @@ module.exports = {
                 e.set({
                     create_at: date.getTime(),
                     modify_at: date.getTime(),
-                    group_fields: groupFields
+                    group_fields: groupFields,
+                    comment: null
                 });
                 e.save();
                 return true;
