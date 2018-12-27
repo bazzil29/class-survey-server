@@ -57,11 +57,23 @@ module.exports = {
             const classes = teacher.class;
             const isExistClassTeacher = classes.find(e => e.id === classId);
             const isExistClass = await Class.findById(classId);
-            if (isExistClass && !isExistClassTeacher) {
+            const teachers = await User.find({ role_id: 2 });
+            if (isExistClass && !isExistClassTeacher && teachers) {
                 classes.push({
                     id: classId,
                     name: isExistClass.name
                 });
+                teachers.findEach(e => {
+                    if (e.id !== userId) {
+                        for (let i = 0; i < e.class.length; i++) {
+                            if (e.class[i].id === classId) {
+                                e.class.splice(i, 1);
+                                break;
+                            }
+                        }
+                        e.save();
+                    }
+                })
                 teacher.set({ class: classes });
                 teacher.save();
                 isExistClass.set({ teacher: userId });
