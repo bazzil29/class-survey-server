@@ -352,15 +352,11 @@ module.exports = {
 
             let count = 0;
 
-            studentSurveys.forEach(e => {
-                if (surveyChecker.verify(e)) {
-                    count++;
-                }
-            })
-
-
             if (studentSurveys) {
                 studentSurveys.forEach(e => {
+                    if (surveyChecker.verify(e)) {
+                        count++;
+                    }
                     if (!!e.comment) {
                         comments.push(e.comment);
                     }
