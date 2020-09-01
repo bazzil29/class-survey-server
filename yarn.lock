@@ -777,13 +777,13 @@ negotiator@0.6.1:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
   integrity sha1-KzJxhOiZIQEXeyhWP7XnECrNDKk=
 
-njwt@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/njwt/-/njwt-0.4.0.tgz#7324ed9d76a9d54b5e265cb7b6a3c55f146fd3c7"
-  integrity sha1-cyTtnXap1UteJly3tqPFXxRv08c=
+njwt@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/njwt/-/njwt-1.0.0.tgz#da5bfa9c251b144a9cdb40a8ad025b3d7b5b52ee"
+  integrity sha512-n+FaPUauVQF/So+YcOACBb/zCxDH5WlCV3dTrX0u7VMGagjDiI39XRJWaPd2PtpT6IpIQUcd7x0twiRZaIQNDQ==
   dependencies:
     ecdsa-sig-formatter "^1.0.5"
-    uuid "^2.0.1"
+    uuid "^3.3.2"
 
 node-pre-gyp@0.11.0:
   version "0.11.0"
@@ -1211,10 +1211,10 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-uuid@^2.0.1:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
-  integrity sha1-Z+LoY3lyFVMN/zGOW/nc6/1Hsho=
+uuid@^3.3.2:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
+  integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
 vary@^1, vary@~1.1.2:
   version "1.1.2"
